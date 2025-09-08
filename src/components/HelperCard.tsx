@@ -12,6 +12,8 @@ import DownloadIcon from '@mui/icons-material/Download'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import WarningAmberIcon from '@mui/icons-material/WarningAmber'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked'
 import React from 'react'
 
 interface InvalidMonth {
@@ -925,7 +927,7 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
             <List dense disablePadding>
               {monthBonuses.map((bonus, idx) => (
                 <React.Fragment key={bonus.id}>
-                  <ListItem sx={{ pl: 0, pr: 0, bgcolor: bonus.given ? 'grey.50' : 'inherit' }} disableGutters>
+                  <ListItem sx={{ pl: 0, pr: 0 }} disableGutters>
                     <Box
                       display="flex"
                       flexDirection="row"
@@ -939,15 +941,20 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
                         flexDirection="column"
                         alignItems="flex-start"
                         minWidth={90}
-                        sx={{ mr: { sm: 1 }, opacity: bonus.given ? 0.5 : 1 }}
+                        sx={{ mr: { sm: 1 } }}
                       >
                         <Box display="flex" alignItems="center" gap={1}>
-                          <AddCircleOutlineIcon fontSize="small" color="success" />
+                          <AddCircleOutlineIcon 
+                            fontSize="small" 
+                            sx={{ 
+                              color: bonus.given ? 'rgba(255, 255, 255, 0.4)' : '#10b981' 
+                            }} 
+                          />
                           <Typography
                             fontWeight={600}
                             sx={{ 
                               fontSize: { xs: '0.875rem', sm: '1rem' },
-                              color: 'rgba(255, 255, 255, 0.9)'
+                              color: bonus.given ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.9)'
                             }}
                           >
                             ₱{bonus.amount.toFixed(2)}
@@ -955,8 +962,11 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
                         </Box>
                         <Typography
                           variant="body2"
-                          color="text.secondary"
-                          sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' }, mt: 0.5 }}
+                          sx={{ 
+                            fontSize: { xs: '0.75rem', sm: '0.875rem' }, 
+                            mt: 0.5,
+                            color: bonus.given ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.6)'
+                          }}
                         >
                           {format(new Date(bonus.date), 'MMM dd, yyyy')}
                         </Typography>
@@ -968,27 +978,50 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
                           size="small"
                           sx={{ 
                             fontSize: { xs: '0.75rem', sm: '0.875rem' }, 
-                            opacity: bonus.given ? 0.5 : 1,
-                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                            color: 'rgba(255, 255, 255, 0.9)',
-                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                            backgroundColor: bonus.given ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.1)',
+                            color: bonus.given ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.9)',
+                            border: bonus.given ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.2)',
                             '& .MuiChip-label': {
-                              color: 'rgba(255, 255, 255, 0.9)',
+                              color: bonus.given ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.9)',
                               fontWeight: 600
                             }
                           }}
                         />
                         <Box ml="auto" display="flex" alignItems="center" gap={0.5}>
-                          {/* Given toggle */}
-                          <Button
+                          {/* Given toggle - Circle checkbox */}
+                          <IconButton
                             size="small"
-                            variant={bonus.given ? 'contained' : 'outlined'}
-                            color={bonus.given ? 'primary' : 'inherit'}
                             onClick={() => handleToggleBonusGiven(bonus.id, !bonus.given)}
-                            sx={{ minWidth: 0, px: 1, fontSize: 12 }}
+                            sx={{ 
+                              p: 0.5,
+                              '&:hover': {
+                                backgroundColor: bonus.given ? 'rgba(16, 185, 129, 0.1)' : 'rgba(0, 0, 0, 0.04)',
+                              }
+                            }}
+                            aria-label={bonus.given ? 'Mark as not given' : 'Mark as given'}
                           >
-                            {bonus.given ? 'Given' : 'Not Given'}
-                          </Button>
+                            {bonus.given ? (
+                              <CheckCircleIcon 
+                                sx={{ 
+                                  color: '#10b981', 
+                                  fontSize: 20,
+                                  '&:hover': {
+                                    color: '#059669',
+                                  }
+                                }} 
+                              />
+                            ) : (
+                              <RadioButtonUncheckedIcon 
+                                sx={{ 
+                                  color: 'rgba(255, 255, 255, 0.6)', 
+                                  fontSize: 20,
+                                  '&:hover': {
+                                    color: 'rgba(255, 255, 255, 0.8)',
+                                  }
+                                }} 
+                              />
+                            )}
+                          </IconButton>
                           <IconButton
                             edge="end"
                             aria-label="delete bonus"

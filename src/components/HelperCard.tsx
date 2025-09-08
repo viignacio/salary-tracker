@@ -1,11 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { format } from 'date-fns'
-import { Minus, Download, Plus, Edit, Trash2 } from 'lucide-react'
 import AddDeductionModal from './AddDeductionModal'
 import AddBonusModal from './AddBonusModal'
-import { Card, CardContent, CardActions, Typography, Button, IconButton, TextField, Divider, List, ListItem, ListItemText, ListItemSecondaryAction, Box, Chip, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Stack } from '@mui/material'
+import { Card, CardContent, Typography, Button, IconButton, TextField, Divider, List, ListItem, Box, Chip, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Stack } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddIcon from '@mui/icons-material/Add'
@@ -21,6 +20,27 @@ interface InvalidMonth {
   month: string
   year: number
   reason?: string | null
+}
+
+interface Deduction {
+  id: string
+  helperId: string
+  purpose: string
+  amount: number
+  date: string
+  month: string
+  year: number
+}
+
+interface Bonus {
+  id: string
+  helperId: string
+  purpose: string
+  amount: number
+  date: string
+  month: string
+  year: number
+  given?: boolean
 }
 
 interface Helper {
@@ -72,26 +92,34 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
 
   const [month, year] = selectedMonth.split('-')
 
-  useEffect(() => {
-    // Find salary for selected month
-    const monthSalary = helper.salaries.find(
+  // Create stable references for the filtered data using useMemo
+  const monthSalary = useMemo(() => {
+    return helper.salaries.find(
       s => s.month === month && s.year === parseInt(year)
     )
-    setSalary(monthSalary?.amount ?? 6000)
+  }, [helper.salaries, month, year])
 
-    // Find deductions for selected month
-    const deductions = helper.deductions.filter(
+  const monthDeductionsData = useMemo(() => {
+    return helper.deductions.filter(
       d => d.month === month && d.year === parseInt(year)
     )
-    setMonthDeductions(deductions)
+  }, [helper.deductions, month, year])
 
-    // Find bonuses for selected month
-    const bonuses = helper.bonuses.filter(
+  const monthBonusesData = useMemo(() => {
+    return helper.bonuses.filter(
       b => b.month === month && b.year === parseInt(year)
     )
-    setMonthBonuses(bonuses)
+  }, [helper.bonuses, month, year])
 
-    // Fetch invalid month for this helper and month
+  // Update state when computed values change
+  useEffect(() => {
+    setSalary(monthSalary?.amount ?? 6000)
+    setMonthDeductions(monthDeductionsData)
+    setMonthBonuses(monthBonusesData)
+  }, [monthSalary, monthDeductionsData, monthBonusesData])
+
+  // Fetch invalid month when helper or month changes
+  useEffect(() => {
     const fetchInvalidMonth = async () => {
       setLoadingInvalid(true)
       try {
@@ -110,11 +138,16 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
       }
     }
     fetchInvalidMonth()
-  }, [helper.id, month, year, onUpdate])
+  }, [helper.id, month, year])
 
   const totalDeductions = monthDeductions.reduce((sum, d) => sum + d.amount, 0)
   const totalBonuses = monthBonuses.reduce((sum, b) => sum + b.amount, 0)
-  const netPay = salary + totalBonuses - totalDeductions
+  
+  // Calculate net pay excluding "Fully paid" deduction
+  const deductionsExcludingFullyPaid = monthDeductions
+    .filter(d => d.purpose !== 'Fully paid')
+    .reduce((sum, d) => sum + d.amount, 0)
+  const netPay = salary + totalBonuses - deductionsExcludingFullyPaid
 
   // Check if "Fully paid" deduction exists for this month
   const isFullyPaid = monthDeductions.some(d => d.purpose === 'Fully paid')
@@ -131,6 +164,14 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: bonusId, given }),
       })
+      
+      // Update local bonuses state immediately
+      setMonthBonuses(prevBonuses => 
+        prevBonuses.map(bonus => 
+          bonus.id === bonusId ? { ...bonus, given } : bonus
+        )
+      )
+      
       onUpdate()
     } catch (error) {
       console.error('Error updating bonus given status:', error)
@@ -177,6 +218,19 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
 
       if (response.ok) {
         setShowAddDeduction(false)
+        // Fetch updated deductions data immediately
+        try {
+          const deductionsRes = await fetch('/api/deductions')
+          if (deductionsRes.ok) {
+            const allDeductions = await deductionsRes.json()
+            const monthDeductions = allDeductions.filter(
+              (d: Deduction) => d.helperId === helper.id && d.month === month && d.year === parseInt(year)
+            )
+            setMonthDeductions(monthDeductions)
+          }
+        } catch (error) {
+          console.error('Error fetching updated deductions:', error)
+        }
         onUpdate()
       }
     } catch (error) {
@@ -202,6 +256,19 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
 
       if (response.ok) {
         setShowAddBonus(false)
+        // Fetch updated bonuses data immediately
+        try {
+          const bonusesRes = await fetch('/api/bonuses')
+          if (bonusesRes.ok) {
+            const allBonuses = await bonusesRes.json()
+            const monthBonuses = allBonuses.filter(
+              (b: Bonus) => b.helperId === helper.id && b.month === month && b.year === parseInt(year)
+            )
+            setMonthBonuses(monthBonuses)
+          }
+        } catch (error) {
+          console.error('Error fetching updated bonuses:', error)
+        }
         onUpdate()
       }
     } catch (error) {
@@ -231,10 +298,57 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
         }),
       })
       if (response.ok) {
+        // Fetch updated deductions data immediately
+        try {
+          const deductionsRes = await fetch('/api/deductions')
+          if (deductionsRes.ok) {
+            const allDeductions = await deductionsRes.json()
+            const monthDeductions = allDeductions.filter(
+              (d: Deduction) => d.helperId === helper.id && d.month === month && d.year === parseInt(year)
+            )
+            setMonthDeductions(monthDeductions)
+          }
+        } catch (error) {
+          console.error('Error fetching updated deductions:', error)
+        }
         onUpdate()
       }
     } catch (error) {
       console.error('Error marking as paid:', error)
+    } finally {
+      setIsPaying(false)
+    }
+  }
+
+  const handleUnmarkPaid = async () => {
+    if (!isFullyPaid) return
+    setIsPaying(true)
+    try {
+      // Find the "Fully paid" deduction
+      const fullyPaidDeduction = monthDeductions.find(d => d.purpose === 'Fully paid')
+      if (!fullyPaidDeduction) return
+
+      const response = await fetch(`/api/deductions?id=${fullyPaidDeduction.id}`, {
+        method: 'DELETE',
+      })
+      if (response.ok) {
+        // Fetch updated deductions data immediately
+        try {
+          const deductionsRes = await fetch('/api/deductions')
+          if (deductionsRes.ok) {
+            const allDeductions = await deductionsRes.json()
+            const monthDeductions = allDeductions.filter(
+              (d: Deduction) => d.helperId === helper.id && d.month === month && d.year === parseInt(year)
+            )
+            setMonthDeductions(monthDeductions)
+          }
+        } catch (error) {
+          console.error('Error fetching updated deductions:', error)
+        }
+        onUpdate()
+      }
+    } catch (error) {
+      console.error('Error unmarking as paid:', error)
     } finally {
       setIsPaying(false)
     }
@@ -256,8 +370,31 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
       if (res.ok) {
         setShowInvalidDialog(false)
         setInvalidReason('')
+        // Refresh invalid month status
+        const invalidRes = await fetch(`/api/invalid-months?helperId=${helper.id}`)
+        if (invalidRes.ok) {
+          const data = await invalidRes.json()
+          const found = data.find((m: InvalidMonth) => m.month === month && m.year === parseInt(year))
+          setInvalidMonth(found || null)
+        }
         onUpdate()
+      } else if (res.status === 409) {
+        // Month is already marked as invalid
+        setShowInvalidDialog(false)
+        setInvalidReason('')
+        // Refresh invalid month status
+        const invalidRes = await fetch(`/api/invalid-months?helperId=${helper.id}`)
+        if (invalidRes.ok) {
+          const data = await invalidRes.json()
+          const found = data.find((m: InvalidMonth) => m.month === month && m.year === parseInt(year))
+          setInvalidMonth(found || null)
+        }
+        onUpdate()
+      } else {
+        console.error('Failed to mark month as invalid:', res.status, await res.text())
       }
+    } catch (error) {
+      console.error('Error marking month as invalid:', error)
     } finally {
       setLoadingInvalid(false)
     }
@@ -270,6 +407,8 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
         method: 'DELETE',
       })
       if (res.ok) {
+        // Clear the invalid month status immediately
+        setInvalidMonth(null)
         onUpdate()
       }
     } finally {
@@ -278,16 +417,51 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
   }
 
   return (
-    <Card elevation={2} sx={{ 
-      borderRadius: 3, 
-      minWidth: { xs: '100%', sm: 390 }, 
-      maxWidth: 600, 
-      width: '100%' 
+    <Card elevation={0} sx={{ 
+      borderRadius: 4, 
+      width: '100%',
+      maxWidth: '100%',
+      minWidth: 0,
+      height: '100%', // Make card take full height
+      display: 'flex',
+      flexDirection: 'column',
+      background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%)',
+      backdropFilter: 'blur(20px)',
+      border: '1px solid rgba(255, 255, 255, 0.1)',
+      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      '&:hover': {
+        transform: 'translateY(-4px)',
+        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4)',
+      }
     }}>
-      <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+      <CardContent sx={{ 
+        p: { xs: 3, sm: 4 },
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        flex: 1,
+      }}>
         {/* Invalid Month Banner */}
         {invalidMonth && (
-          <Alert severity="warning" icon={<WarningAmberIcon />} sx={{ mb: 2 }}>
+          <Alert 
+            severity="warning" 
+            icon={<WarningAmberIcon />} 
+            sx={{ 
+              mb: 3,
+              borderRadius: 2,
+              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.1) 100%)',
+              border: '1px solid rgba(245, 158, 11, 0.4)',
+              color: 'rgba(255, 255, 255, 0.9)',
+              '& .MuiAlert-icon': {
+                color: '#fbbf24',
+                alignSelf: 'center',
+              },
+              '& .MuiAlert-message': {
+                color: 'rgba(255, 255, 255, 0.9)',
+              }
+            }}
+          >
             <strong>This month is marked as invalid.</strong>
             {invalidMonth.reason && (
               <><br />Reason: {invalidMonth.reason}</>
@@ -301,12 +475,20 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
           alignItems={{ xs: 'center', sm: 'center' }} 
           justifyContent="space-between" 
           gap={{ xs: 1, sm: 0 }}
-          mb={2}
+          mb={3}
+          pb={2}
+          borderBottom="1px solid rgba(255, 255, 255, 0.1)"
         >
           <Typography 
-            variant="h6" 
+            variant="h5" 
             fontWeight={700}
-            sx={{ fontSize: { xs: '1.125rem', sm: '1.25rem' } }}
+            sx={{ 
+              fontSize: { xs: '1.25rem', sm: '1.5rem' },
+              background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
           >
             {helper.name}
           </Typography>
@@ -319,31 +501,81 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
               sx={{ 
                 fontWeight: 600,
                 minWidth: { xs: 'auto', sm: 'auto' },
-                px: { xs: 1.5, sm: 2 }
+                px: { xs: 1.5, sm: 2 },
+                borderRadius: 2,
+                borderColor: 'rgba(99, 102, 241, 0.3)',
+                color: '#6366f1',
+                '&:hover': {
+                  borderColor: '#6366f1',
+                  background: 'rgba(99, 102, 241, 0.05)',
+                }
               }}
             >
               Export
             </Button>
           </Box>
         </Box>
+        
+        {/* Main Content with Flexbox */}
+        <Box 
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+            gap: 3,
+          }}
+        >
+          {/* Scrollable Content Area */}
+          <Box 
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 3,
+              flex: 1,
+              minHeight: 0, // Allow shrinking
+            }}
+          >
         {/* Salary Section */}
-        <Box mb={3}>
+        <Box 
+          p={3}
+          sx={{
+            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.08) 100%)',
+            borderRadius: 3,
+            border: '1px solid rgba(16, 185, 129, 0.3)',
+          }}
+        >
           <Box 
             display="flex" 
             flexDirection="row"
             alignItems="center"
             gap={1}
-            mb={1}
+            mb={2}
           >
             <Typography 
               variant="subtitle1" 
-              fontWeight={500}
-              sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+              fontWeight={600}
+              sx={{ 
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+                color: '#059669',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}
             >
               Monthly Salary
             </Typography>
             {!isEditingSalary && (
-              <IconButton color="primary" onClick={() => setIsEditingSalary(true)} size="small" sx={{ ml: 0 }}>
+              <IconButton 
+                color="primary" 
+                onClick={() => setIsEditingSalary(true)} 
+                size="small" 
+                sx={{ 
+                  ml: 0,
+                  background: 'rgba(99, 102, 241, 0.1)',
+                  '&:hover': {
+                    background: 'rgba(99, 102, 241, 0.2)',
+                  }
+                }}
+              >
                 <EditIcon fontSize="small" />
               </IconButton>
             )}
@@ -359,12 +591,31 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
                 type="number"
                 value={salary === 0 ? '' : salary}
                 onChange={(e) => setSalary(parseFloat(e.target.value) || 0)}
-                onFocus={e => { if (salary === 0) setSalary(NaN); }}
+                onFocus={() => { if (salary === 0) setSalary(NaN); }}
                 size="small"
                 variant="outlined"
                 placeholder="0"
                 inputProps={{ min: 0, step: 0.01 }}
-                sx={{ flex: 1 }}
+                sx={{ 
+                  flex: 1,
+                  '& .MuiOutlinedInput-input': {
+                    color: 'text.primary',
+                    fontWeight: 500,
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: 'background.paper',
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'primary.main',
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'primary.main',
+                      borderWidth: 2,
+                    },
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: 'text.secondary',
+                  },
+                }}
               />
               <Box 
                 display="flex" 
@@ -391,10 +642,17 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
             </Box>
           ) : (
             <Typography 
-              variant="h5" 
+              variant="h4" 
               color="success.main" 
               fontWeight={700}
-              sx={{ fontSize: { xs: '1.5rem', sm: '1.75rem' } }}
+              sx={{ 
+                fontSize: { xs: '1.75rem', sm: '2rem' },
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                textShadow: '0 2px 4px rgba(16, 185, 129, 0.1)',
+              }}
             >
               ₱{salary.toFixed(2)}
             </Typography>
@@ -402,19 +660,32 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
         </Box>
 
         {/* Deductions Section */}
-        <Box mb={3}>
+        <Box 
+          p={3}
+          sx={{
+            background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.08) 100%)',
+            borderRadius: 3,
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            minHeight: 120, // Consistent minimum height
+          }}
+        >
           <Box 
             display="flex" 
             flexDirection={{ xs: 'row', sm: 'row' }}
             alignItems={{ xs: 'center', sm: 'center' }} 
             justifyContent="space-between" 
             gap={{ xs: 1, sm: 0 }}
-            mb={1}
+            mb={2}
           >
             <Typography 
               variant="subtitle1" 
-              fontWeight={500}
-              sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+              fontWeight={600}
+              sx={{ 
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+                color: '#dc2626',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}
             >
               Deductions
             </Typography>
@@ -428,7 +699,13 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
                 sx={{ 
                   fontWeight: 600,
                   minWidth: { xs: 'auto', sm: 'auto' },
-                  px: { xs: 1.5, sm: 2 }
+                  px: { xs: 1.5, sm: 2 },
+                  borderRadius: 2,
+                  borderColor: 'rgba(239, 68, 68, 0.3)',
+                  '&:hover': {
+                    borderColor: '#ef4444',
+                    background: 'rgba(239, 68, 68, 0.05)',
+                  }
                 }}
               >
                 Add
@@ -436,13 +713,27 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
             </Box>
           </Box>
           {monthDeductions.length === 0 ? (
-            <Typography 
-              color="text.secondary" 
-              fontSize={14}
-              sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+            <Box 
+              textAlign="center" 
+              py={2}
+              sx={{
+                background: 'rgba(239, 68, 68, 0.03)',
+                borderRadius: 2,
+                border: '1px dashed rgba(239, 68, 68, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: 60,
+              }}
             >
-              No deductions for this month
-            </Typography>
+              <Typography 
+                color="text.secondary" 
+                fontSize={14}
+                sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+              >
+                No deductions for this month
+              </Typography>
+            </Box>
           ) : (
             <List dense disablePadding>
               {monthDeductions.map((deduction, idx) => (
@@ -466,9 +757,11 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
                         <Box display="flex" alignItems="center" gap={1}>
                           <RemoveCircleOutlineIcon fontSize="small" color="error" />
                           <Typography
-                            color="error.main"
                             fontWeight={600}
-                            sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+                            sx={{ 
+                              fontSize: { xs: '0.875rem', sm: '1rem' },
+                              color: 'rgba(255, 255, 255, 0.9)'
+                            }}
                           >
                             ₱{deduction.amount.toFixed(2)}
                           </Typography>
@@ -486,16 +779,31 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
                         <Chip
                           label={deduction.purpose}
                           size="small"
-                          sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+                          sx={{ 
+                            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                            color: 'rgba(255, 255, 255, 0.9)',
+                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                            '& .MuiChip-label': {
+                              color: 'rgba(255, 255, 255, 0.9)',
+                              fontWeight: 600
+                            }
+                          }}
                         />
                         <Box ml="auto" display="flex" alignItems="center">
                           <IconButton
                             edge="end"
                             aria-label="delete deduction"
-                            color="error"
+                            sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
                             onClick={async () => {
                               if (window.confirm('Delete this deduction?')) {
-                                await fetch(`/api/deductions?id=${deduction.id}`, { method: 'DELETE' })
+                                const response = await fetch(`/api/deductions?id=${deduction.id}`, { method: 'DELETE' })
+                                if (response.ok) {
+                                  // Update local deductions state immediately
+                                  setMonthDeductions(prevDeductions => 
+                                    prevDeductions.filter(d => d.id !== deduction.id)
+                                  )
+                                }
                                 onUpdate()
                               }
                             }}
@@ -516,39 +824,55 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
               <Box display="flex" alignItems="center" justifyContent="space-between">
                 <Typography 
                   fontWeight={600}
-                  sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+                  sx={{ 
+                    fontSize: { xs: '0.875rem', sm: '1rem' },
+                    color: 'rgba(255, 255, 255, 0.9)'
+                  }}
                 >
                   Total Deductions:
                 </Typography>
                 <Typography 
-                  color="error.main" 
                   fontWeight={700}
-                  sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+                  sx={{ 
+                    fontSize: { xs: '0.875rem', sm: '1rem' },
+                    color: 'rgba(255, 255, 255, 0.9)'
+                  }}
                 >
-                  <RemoveCircleOutlineIcon fontSize="small" color="error" sx={{ mr: 0.5 }} />₱{totalDeductions.toFixed(2)}
+                  <RemoveCircleOutlineIcon fontSize="small" sx={{ mr: 0.5, color: 'rgba(255, 255, 255, 0.7)' }} />₱{totalDeductions.toFixed(2)}
                 </Typography>
               </Box>
             </Box>
           )}
         </Box>
 
-        {/* Divider between Deductions and Additions */}
-        <Divider sx={{ my: 2 }} />
 
         {/* Additions Section */}
-        <Box mb={3}>
+        <Box 
+          p={3}
+          sx={{
+            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.08) 100%)',
+            borderRadius: 3,
+            border: '1px solid rgba(16, 185, 129, 0.3)',
+            minHeight: 120, // Consistent minimum height
+          }}
+        >
           <Box 
             display="flex" 
             flexDirection={{ xs: 'row', sm: 'row' }}
             alignItems={{ xs: 'center', sm: 'center' }} 
             justifyContent="space-between" 
             gap={{ xs: 1, sm: 0 }}
-            mb={1}
+            mb={2}
           >
             <Typography 
               variant="subtitle1" 
-              fontWeight={500}
-              sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+              fontWeight={600}
+              sx={{ 
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+                color: '#059669',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}
             >
               Additions
             </Typography>
@@ -562,7 +886,13 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
                 sx={{ 
                   fontWeight: 600,
                   minWidth: { xs: 'auto', sm: 'auto' },
-                  px: { xs: 1.5, sm: 2 }
+                  px: { xs: 1.5, sm: 2 },
+                  borderRadius: 2,
+                  borderColor: 'rgba(16, 185, 129, 0.3)',
+                  '&:hover': {
+                    borderColor: '#10b981',
+                    background: 'rgba(16, 185, 129, 0.05)',
+                  }
                 }}
               >
                 Add
@@ -570,13 +900,27 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
             </Box>
           </Box>
           {monthBonuses.length === 0 ? (
-            <Typography 
-              color="text.secondary" 
-              fontSize={14}
-              sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+            <Box 
+              textAlign="center" 
+              py={2}
+              sx={{
+                background: 'rgba(16, 185, 129, 0.03)',
+                borderRadius: 2,
+                border: '1px dashed rgba(16, 185, 129, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: 60,
+              }}
             >
-              No additions for this month
-            </Typography>
+              <Typography 
+                color="text.secondary" 
+                fontSize={14}
+                sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+              >
+                No additions for this month
+              </Typography>
+            </Box>
           ) : (
             <List dense disablePadding>
               {monthBonuses.map((bonus, idx) => (
@@ -600,9 +944,11 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
                         <Box display="flex" alignItems="center" gap={1}>
                           <AddCircleOutlineIcon fontSize="small" color="success" />
                           <Typography
-                            color="success.main"
                             fontWeight={600}
-                            sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+                            sx={{ 
+                              fontSize: { xs: '0.875rem', sm: '1rem' },
+                              color: 'rgba(255, 255, 255, 0.9)'
+                            }}
                           >
                             ₱{bonus.amount.toFixed(2)}
                           </Typography>
@@ -620,8 +966,17 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
                         <Chip
                           label={bonus.purpose}
                           size="small"
-                          color="success"
-                          sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' }, opacity: bonus.given ? 0.5 : 1 }}
+                          sx={{ 
+                            fontSize: { xs: '0.75rem', sm: '0.875rem' }, 
+                            opacity: bonus.given ? 0.5 : 1,
+                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                            color: 'rgba(255, 255, 255, 0.9)',
+                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                            '& .MuiChip-label': {
+                              color: 'rgba(255, 255, 255, 0.9)',
+                              fontWeight: 600
+                            }
+                          }}
                         />
                         <Box ml="auto" display="flex" alignItems="center" gap={0.5}>
                           {/* Given toggle */}
@@ -637,10 +992,16 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
                           <IconButton
                             edge="end"
                             aria-label="delete bonus"
-                            color="error"
+                            sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
                             onClick={async () => {
                               if (window.confirm('Delete this addition?')) {
-                                await fetch(`/api/bonuses?id=${bonus.id}`, { method: 'DELETE' })
+                                const response = await fetch(`/api/bonuses?id=${bonus.id}`, { method: 'DELETE' })
+                                if (response.ok) {
+                                  // Update local bonuses state immediately
+                                  setMonthBonuses(prevBonuses => 
+                                    prevBonuses.filter(b => b.id !== bonus.id)
+                                  )
+                                }
                                 onUpdate()
                               }
                             }}
@@ -661,58 +1022,120 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
               <Box display="flex" alignItems="center" justifyContent="space-between">
                 <Typography 
                   fontWeight={600}
-                  sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+                  sx={{ 
+                    fontSize: { xs: '0.875rem', sm: '1rem' },
+                    color: 'rgba(255, 255, 255, 0.9)'
+                  }}
                 >
                   Total Additions:
                 </Typography>
                 <Typography 
-                  color="success.main" 
                   fontWeight={700}
-                  sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+                  sx={{ 
+                    fontSize: { xs: '0.875rem', sm: '1rem' },
+                    color: 'rgba(255, 255, 255, 0.9)'
+                  }}
                 >
-                  <AddCircleOutlineIcon fontSize="small" color="success" sx={{ mr: 0.5 }} />₱{totalBonuses.toFixed(2)}
+                  <AddCircleOutlineIcon fontSize="small" sx={{ mr: 0.5, color: 'rgba(255, 255, 255, 0.7)' }} />₱{totalBonuses.toFixed(2)}
                 </Typography>
               </Box>
             </Box>
           )}
         </Box>
+          </Box> {/* Close Scrollable Content Area */}
 
+          {/* Bottom Section - Always Sticky */}
+          <Box 
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 3,
+              flexShrink: 0, // Don't shrink this section
+            }}
+          >
+            {/* Divider */}
+            <Box sx={{ height: '32px', display: 'flex', alignItems: 'center' }}>
+              <Box 
+                sx={{ 
+                  width: '100%', 
+                  height: '1px', 
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%)' 
+                }} 
+              />
+            </Box>
         {/* Net Pay Section */}
-        <Divider sx={{ my: 2 }} />
-        <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-          <Typography 
-            variant="subtitle1" 
-            fontWeight={600}
-            sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
-          >
-            Net Pay:
-          </Typography>
-          <Typography 
-            variant="h5" 
-            fontWeight={700} 
-            color={netPay >= 0 ? 'success.main' : 'error.main'}
-            sx={{ fontSize: { xs: '1.5rem', sm: '1.75rem' } }}
-          >
-            ₱{netPay.toFixed(2)}
-          </Typography>
-        </Box>
-        <Button
-          fullWidth
-          variant={isFullyPaid ? 'contained' : 'outlined'}
-          color={isFullyPaid ? 'success' : 'primary'}
-          onClick={handleMarkPaid}
-          disabled={toPay <= 0 || isFullyPaid || isPaying}
-          sx={{ 
-            fontWeight: 700, 
-            py: { xs: 1.5, sm: 1.2 }, 
-            mb: 1,
-            fontSize: { xs: '0.875rem', sm: '1rem' }
+        <Box 
+          p={3}
+          sx={{
+            background: netPay >= 0 
+              ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.1) 100%)'
+              : 'linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.1) 100%)',
+            borderRadius: 3,
+            border: netPay >= 0 
+              ? '1px solid rgba(16, 185, 129, 0.4)'
+              : '1px solid rgba(239, 68, 68, 0.4)',
           }}
         >
-          {isFullyPaid ? 'Fully Paid' : isPaying ? 'Marking...' : 'Paid'}
-        </Button>
-        {/* Mark/Unmark Invalid Button (moved below Paid button) */}
-        <Box mb={2}>
+          <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+            <Typography 
+              variant="subtitle1" 
+              fontWeight={600}
+              sx={{ 
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+                color: netPay >= 0 ? '#059669' : '#dc2626',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}
+            >
+              Net Pay:
+            </Typography>
+            <Typography 
+              variant="h4" 
+              fontWeight={700} 
+              color={netPay >= 0 ? 'success.main' : 'error.main'}
+              sx={{ 
+                fontSize: { xs: '1.75rem', sm: '2rem' },
+                background: netPay >= 0 
+                  ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                  : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                textShadow: netPay >= 0 
+                  ? '0 2px 4px rgba(16, 185, 129, 0.1)'
+                  : '0 2px 4px rgba(239, 68, 68, 0.1)',
+              }}
+            >
+              ₱{netPay.toFixed(2)}
+            </Typography>
+          </Box>
+          <Button
+            fullWidth
+            variant={isFullyPaid ? 'contained' : 'contained'}
+            color={isFullyPaid ? 'error' : 'success'}
+            onClick={isFullyPaid ? handleUnmarkPaid : handleMarkPaid}
+            disabled={(!isFullyPaid && toPay <= 0) || isPaying}
+            sx={{ 
+              fontWeight: 700, 
+              py: { xs: 1.5, sm: 1.2 }, 
+              mb: 2,
+              fontSize: { xs: '0.875rem', sm: '1rem' },
+              borderRadius: 2,
+              background: isFullyPaid 
+                ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
+                : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              '&:hover': {
+                background: isFullyPaid 
+                  ? 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)'
+                  : 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+              }
+            }}
+          >
+            {isFullyPaid ? (isPaying ? 'Unmarking...' : 'Unmark as Paid') : (isPaying ? 'Marking...' : 'Mark as Paid')}
+          </Button>
+        </Box>
+        {/* Mark/Unmark Invalid Button */}
+        <Box>
           {invalidMonth ? (
             <Button
               variant="contained"
@@ -721,7 +1144,12 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
               disabled={loadingInvalid}
               sx={{ 
                 fontWeight: 600,
-                fontSize: { xs: '0.875rem', sm: '1rem' }
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+                borderRadius: 2,
+                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
+                }
               }}
               fullWidth
             >
@@ -735,7 +1163,22 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
               disabled={loadingInvalid}
               sx={{ 
                 fontWeight: 600,
-                fontSize: { xs: '0.875rem', sm: '1rem' }
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+                borderRadius: 2,
+                borderColor: '#f59e0b',
+                color: '#f59e0b',
+                background: 'rgba(245, 158, 11, 0.1)',
+                '&:hover': {
+                  borderColor: '#d97706',
+                  color: '#d97706',
+                  background: 'rgba(245, 158, 11, 0.2)',
+                  transform: 'translateY(-1px)',
+                },
+                '&:disabled': {
+                  borderColor: 'rgba(245, 158, 11, 0.3)',
+                  color: 'rgba(245, 158, 11, 0.3)',
+                  background: 'rgba(245, 158, 11, 0.05)',
+                }
               }}
               fullWidth
             >
@@ -768,16 +1211,52 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
           </form>
         </Dialog>
         {/* To Pay Section */}
-        <Box mb={2}>
+        <Box 
+          p={3}
+          sx={{
+            background: toPay >= 0 
+              ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(99, 102, 241, 0.1) 100%)'
+              : 'linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.1) 100%)',
+            borderRadius: 3,
+            border: toPay >= 0 
+              ? '1px solid rgba(99, 102, 241, 0.4)'
+              : '1px solid rgba(239, 68, 68, 0.4)',
+          }}
+        >
           <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Typography fontWeight={700} sx={{ fontSize: { xs: '1rem', sm: '1.1rem' } }}>
+            <Typography 
+              fontWeight={700} 
+              sx={{ 
+                fontSize: { xs: '1rem', sm: '1.1rem' },
+                color: toPay >= 0 ? '#6366f1' : '#dc2626',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}
+            >
               To Pay:
             </Typography>
-            <Typography fontWeight={700} color={toPay >= 0 ? 'success.main' : 'error.main'} sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
+            <Typography 
+              fontWeight={700} 
+              color={toPay >= 0 ? 'primary.main' : 'error.main'} 
+              sx={{ 
+                fontSize: { xs: '1.5rem', sm: '1.75rem' },
+                background: toPay >= 0 
+                  ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)'
+                  : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                textShadow: toPay >= 0 
+                  ? '0 2px 4px rgba(99, 102, 241, 0.1)'
+                  : '0 2px 4px rgba(239, 68, 68, 0.1)',
+              }}
+            >
               ₱{toPay.toFixed(2)}
             </Typography>
           </Box>
         </Box>
+          </Box> {/* Close Bottom Section */}
+        </Box> {/* Close Main Content Flexbox */}
       </CardContent>
       <AddDeductionModal
         isOpen={showAddDeduction}

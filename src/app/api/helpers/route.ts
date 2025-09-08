@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { cookies } from 'next/headers'
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   const cookieStore = await cookies();
   const cookie = cookieStore.get('salary_auth');
   if (!cookie || cookie.value !== 'authenticated') {

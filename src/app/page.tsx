@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { format, addMonths } from 'date-fns'
 import HelperCard from '@/components/HelperCard'
@@ -48,81 +48,7 @@ export default function Home() {
   const isInitialLoad = useRef(true)
   const router = useRouter()
 
-  const fetchHelpers = async () => {
-    try {
-      const response = await fetch('/api/helpers')
-      if (!response.ok) {
-        if (response.status === 401) {
-          router.replace('/login')
-          return
-        }
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      const data = await response.json()
-      const helpersData = Array.isArray(data) ? data : []
-      setHelpers(helpersData)
-      
-      // Only check for redirect on the very first load AND when helpers are loaded
-      if (isInitialLoad.current && helpersData.length > 0) {
-        console.log('Initial load detected with helpers, will check for redirect')
-        isInitialLoad.current = false
-        setTimeout(() => {
-          console.log('Calling checkAndRedirectIfMonthFullyPaid')
-          checkAndRedirectIfMonthFullyPaid(helpersData)
-        }, 100)
-      }
-    } catch (error) {
-      console.error('Error fetching helpers:', error)
-      setHelpers([]) // Set empty array on error
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    // Check authentication by making a request to a protected endpoint
-    const checkAuth = async () => {
-      try {
-        const response = await fetch('/api/helpers')
-        if (response.status === 401) {
-          router.replace('/login')
-          return
-        }
-        setAuthChecked(true)
-        fetchHelpers()
-      } catch (error) {
-        console.error('Auth check failed:', error)
-        router.replace('/login')
-      }
-    }
-
-    checkAuth()
-  }, [router])
-
-
-
-  const handleAddHelper = async (name: string) => {
-    try {
-      const response = await fetch('/api/helpers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name }),
-      })
-      
-      if (response.ok) {
-        await fetchHelpers()
-        setShowAddHelper(false)
-      }
-    } catch (error) {
-      console.error('Error adding helper:', error)
-    }
-  }
-
-  const handleMonthChange = (month: string) => {
-    setSelectedMonth(month)
-  }
-
-  const checkAndRedirectIfMonthFullyPaid = (helpersToCheck = helpers) => {
+  const checkAndRedirectIfMonthFullyPaid = useCallback((helpersToCheck: Helper[]) => {
     console.log('Checking for redirect...', { selectedMonth, helpersCount: helpersToCheck.length })
     
     // Check if all helpers are fully paid for the current month
@@ -170,6 +96,78 @@ export default function Home() {
     } else {
       console.log('Not redirecting - no helpers or not all fully paid')
     }
+  }, [selectedMonth])
+
+  const fetchHelpers = useCallback(async () => {
+    try {
+      const response = await fetch('/api/helpers')
+      if (!response.ok) {
+        if (response.status === 401) {
+          router.replace('/login')
+          return
+        }
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const data = await response.json()
+      const helpersData = Array.isArray(data) ? data : []
+      setHelpers(helpersData)
+      
+      // Only check for redirect on the very first load AND when helpers are loaded
+      if (isInitialLoad.current && helpersData.length > 0) {
+        console.log('Initial load detected with helpers, will check for redirect')
+        isInitialLoad.current = false
+        setTimeout(() => {
+          console.log('Calling checkAndRedirectIfMonthFullyPaid')
+          checkAndRedirectIfMonthFullyPaid(helpersData)
+        }, 100)
+      }
+    } catch (error) {
+      console.error('Error fetching helpers:', error)
+      setHelpers([]) // Set empty array on error
+    } finally {
+      setLoading(false)
+    }
+  }, [router])
+
+  useEffect(() => {
+    // Check authentication by making a request to a protected endpoint
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/helpers')
+        if (response.status === 401) {
+          router.replace('/login')
+          return
+        }
+        setAuthChecked(true)
+        fetchHelpers()
+      } catch (error) {
+        console.error('Auth check failed:', error)
+        router.replace('/login')
+      }
+    }
+
+    checkAuth()
+  }, [router])
+
+  const handleAddHelper = async (name: string) => {
+    try {
+      const response = await fetch('/api/helpers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+      })
+      
+      if (response.ok) {
+        await fetchHelpers()
+        setShowAddHelper(false)
+      }
+    } catch (error) {
+      console.error('Error adding helper:', error)
+    }
+  }
+
+  const handleMonthChange = (month: string) => {
+    setSelectedMonth(month)
   }
 
   const handleLogout = async () => {
@@ -179,7 +177,7 @@ export default function Home() {
 
   if (!authChecked) {
     return (
-      <Box minHeight="100vh" display="flex" alignItems="center" justifyContent="center" bgcolor="#f5f5f5">
+      <Box height="100vh" display="flex" alignItems="center" justifyContent="center" bgcolor="#f5f5f5">
         <Box textAlign="center">
           <CircularProgress color="primary" />
           <Typography mt={2} color="text.secondary">Checking authentication...</Typography>
@@ -190,7 +188,7 @@ export default function Home() {
 
   if (loading) {
     return (
-      <Box minHeight="100vh" display="flex" alignItems="center" justifyContent="center" bgcolor="#f5f5f5">
+      <Box height="100vh" display="flex" alignItems="center" justifyContent="center" bgcolor="#f5f5f5">
         <Box textAlign="center">
           <CircularProgress color="primary" />
           <Typography mt={2} color="text.secondary">Loading...</Typography>
@@ -200,93 +198,177 @@ export default function Home() {
   }
 
   return (
-    <Box minHeight="100vh" bgcolor="#f5f5f5">
-      <Container maxWidth="md" sx={{ py: { xs: 3, sm: 6 }, px: { xs: 2, sm: 3 } }}>
+    <Box 
+      height="100vh" 
+      sx={{
+        background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 50%, rgba(236, 72, 153, 0.1) 100%)',
+        position: 'relative',
+        overflow: 'auto',
+      }}
+    >
+      <Container maxWidth={false} sx={{ 
+        width: '80%', 
+        py: { xs: 3, sm: 6 }, 
+        px: { xs: 2, sm: 3 }, 
+        position: 'relative', 
+        zIndex: 1 
+      }}>
         {/* Header */}
-        <Box mb={{ xs: 3, sm: 5 }}>
+        <Box 
+          mb={{ xs: 4, sm: 6 }}
+          sx={{
+            background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%)',
+            backdropFilter: 'blur(20px)',
+            borderRadius: 4,
+            p: { xs: 3, sm: 4 },
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+          }}
+        >
           <Box 
             display="flex" 
             flexDirection={{ xs: 'column', sm: 'row' }}
             justifyContent="space-between" 
-            alignItems={{ xs: 'flex-start', sm: 'flex-start' }} 
+            alignItems={{ xs: 'flex-start', sm: 'center' }} 
             gap={{ xs: 2, sm: 0 }}
             mb={2}
           >
-            <Typography 
-              variant="h4" 
-              fontWeight={700} 
-              color="text.primary" 
-              gutterBottom
-              sx={{ 
-                fontSize: { xs: '1.75rem', sm: '2.125rem' },
-                lineHeight: { xs: 1.2, sm: 1.3 }
-              }}
-            >
-              Claver GC Salary Tracker
-            </Typography>
+            <Box>
+              <Typography 
+                variant="h3" 
+                fontWeight={700} 
+                sx={{ 
+                  fontSize: { xs: '1.75rem', sm: '2.25rem' },
+                  lineHeight: { xs: 1.2, sm: 1.3 },
+                  background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  mb: 1
+                }}
+              >
+                Claver GC Salary Tracker
+              </Typography>
+              <Typography 
+                sx={{ 
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                  fontWeight: 500,
+                  color: 'rgba(255, 255, 255, 0.8)'
+                }}
+              >
+                Manage monthly salaries and deductions for your household helpers
+              </Typography>
+            </Box>
             <Button
               variant="outlined"
               startIcon={<LogoutIcon />}
               onClick={handleLogout}
               sx={{ 
-                minWidth: { xs: 'auto', sm: 100 },
+                minWidth: { xs: 'auto', sm: 120 },
                 px: { xs: 2, sm: 3 },
-                py: { xs: 1, sm: 1.5 }
+                py: { xs: 1.5, sm: 1.5 },
+                borderRadius: 2,
+                borderColor: 'rgba(239, 68, 68, 0.3)',
+                color: '#ef4444',
+                fontWeight: 600,
+                '&:hover': {
+                  borderColor: '#ef4444',
+                  background: 'rgba(239, 68, 68, 0.05)',
+                }
               }}
             >
               Logout
             </Button>
           </Box>
-          <Typography 
-            color="text.secondary"
-            sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
-          >
-            Manage monthly salaries and deductions for your household helpers
-          </Typography>
         </Box>
 
         {/* Controls */}
         <Box 
           display="flex" 
           flexDirection={{ xs: 'column', sm: 'row' }} 
-          gap={{ xs: 2, sm: 2 }} 
-          mb={{ xs: 3, sm: 5 }}
+          gap={{ xs: 2, sm: 3 }} 
+          mb={{ xs: 4, sm: 6 }}
           alignItems={{ xs: 'stretch', sm: 'center' }}
+          justifyContent={{ xs: 'stretch', sm: 'space-between' }}
+          sx={{
+            background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.7) 100%)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: 3,
+            p: 3,
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+          }}
         >
-          <MonthSelector
-            selectedMonth={selectedMonth}
-            onMonthChange={handleMonthChange}
-          />
-          <Button
+          <Box sx={{ display: { xs: 'none', sm: 'block' }, flex: 1 }} />
+          <Box sx={{ display: 'flex', justifyContent: 'center', flex: 1 }}>
+            <MonthSelector
+              selectedMonth={selectedMonth}
+              onMonthChange={handleMonthChange}
+            />
+          </Box>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', flex: 1 }}>
+            <Button
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => setShowAddHelper(true)}
             sx={{ 
-              minWidth: { xs: 'auto', sm: 150 }, 
+              minWidth: { xs: 'auto', sm: 160 }, 
               fontWeight: 600,
-              py: { xs: 1.5, sm: 1.5 }
+              py: { xs: 1.5, sm: 1.5 },
+              borderRadius: 2,
+              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+                transform: 'translateY(-1px)',
+              }
             }}
           >
             Add Helper
           </Button>
+          </Box>
         </Box>
 
         {/* Helpers Grid */}
         {helpers.length === 0 ? (
-          <Box textAlign="center" py={{ xs: 6, sm: 8 }}>
-            <MonetizationOnOutlinedIcon sx={{ fontSize: { xs: 48, sm: 60 }, color: 'grey.300', mb: 2 }} />
+          <Box 
+            textAlign="center" 
+            py={{ xs: 8, sm: 10 }}
+            sx={{
+              background: 'rgba(255, 255, 255, 0.7)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: 4,
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+            }}
+          >
+            <Box
+              sx={{
+                width: 80,
+                height: 80,
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mx: 'auto',
+                mb: 3,
+                boxShadow: '0 8px 24px rgba(99, 102, 241, 0.3)',
+              }}
+            >
+              <MonetizationOnOutlinedIcon sx={{ fontSize: 40, color: 'white' }} />
+            </Box>
             <Typography 
-              variant="h6" 
-              fontWeight={500} 
+              variant="h5" 
+              fontWeight={600} 
               color="text.primary" 
-              mb={1}
-              sx={{ fontSize: { xs: '1.125rem', sm: '1.25rem' } }}
+              mb={2}
+              sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
             >
               No helpers added yet
             </Typography>
             <Typography 
               color="text.secondary" 
-              mb={3}
+              mb={4}
               sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
             >
               Get started by adding your first household helper
@@ -296,9 +378,15 @@ export default function Home() {
               startIcon={<AddIcon />}
               onClick={() => setShowAddHelper(true)}
               sx={{ 
-                minWidth: { xs: 'auto', sm: 150 }, 
+                minWidth: { xs: 'auto', sm: 160 }, 
                 fontWeight: 600,
-                py: { xs: 1.5, sm: 1.5 }
+                py: { xs: 1.5, sm: 1.5 },
+                borderRadius: 2,
+                background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+                  transform: 'translateY(-2px)',
+                }
               }}
             >
               Add Helper
@@ -311,9 +399,7 @@ export default function Home() {
             justifyContent="center" 
             sx={{ 
               width: '100%', 
-              maxWidth: 900, 
-              mx: 'auto', 
-              px: { xs: 0, sm: 2 } 
+              mx: 'auto'
             }}
           >
             {helpers.map((helper) => (
@@ -321,8 +407,13 @@ export default function Home() {
                 key={helper.id} 
                 item 
                 xs={12} 
-                md={6} 
-                sx={{ display: 'flex', justifyContent: 'center' }}
+                sm={6} 
+                sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'center',
+                  minWidth: { xs: '100%', sm: 'calc(50% - 12px)' },
+                  maxWidth: { xs: '100%', sm: 'calc(50% - 12px)' }
+                }}
               >
                 <HelperCard
                   helper={helper}

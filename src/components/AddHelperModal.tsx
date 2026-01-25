@@ -56,9 +56,8 @@ export default function AddHelperModal({ isOpen, onClose, onAdd }: AddHelperModa
           onClick={onClose} 
           size="small"
           sx={{
-            background: 'rgba(239, 68, 68, 0.1)',
             '&:hover': {
-              background: 'rgba(239, 68, 68, 0.2)',
+              background: 'transparent',
             }
           }}
         >
@@ -102,18 +101,17 @@ export default function AddHelperModal({ isOpen, onClose, onAdd }: AddHelperModa
           <Button 
             onClick={onClose} 
             color="inherit" 
-            variant="outlined"
+            variant="text"
             size="small"
             sx={{ 
               flex: { xs: 1, sm: 'auto' },
               py: { xs: 1, sm: 0.75 },
               px: { xs: 1.5, sm: 2 },
-              borderRadius: 1,
-              borderColor: 'rgba(0, 0, 0, 0.2)',
               fontSize: '0.8125rem',
+              textTransform: 'none',
               '&:hover': {
-                borderColor: '#64748b',
-                background: 'rgba(0, 0, 0, 0.04)',
+                background: 'transparent',
+                textDecoration: 'underline',
               }
             }}
           >
@@ -121,17 +119,18 @@ export default function AddHelperModal({ isOpen, onClose, onAdd }: AddHelperModa
           </Button>
           <Button 
             type="submit" 
-            variant="contained"
+            variant="text"
             size="small"
             sx={{ 
               flex: { xs: 1, sm: 'auto' },
               py: { xs: 1, sm: 0.75 },
               px: { xs: 1.5, sm: 2 },
-              borderRadius: 1,
-              background: '#6366f1',
               fontSize: '0.8125rem',
+              textTransform: 'none',
+              color: '#6366f1',
               '&:hover': {
-                background: '#4f46e5',
+                background: 'transparent',
+                textDecoration: 'underline',
               }
             }}
           >

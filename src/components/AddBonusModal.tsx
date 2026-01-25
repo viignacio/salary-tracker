@@ -65,9 +65,8 @@ export default function AddBonusModal({ isOpen, onClose, onAdd }: AddBonusModalP
           onClick={onClose} 
           size="small"
           sx={{
-            background: 'rgba(16, 185, 129, 0.1)',
             '&:hover': {
-              background: 'rgba(16, 185, 129, 0.2)',
+              background: 'transparent',
             }
           }}
         >
@@ -167,18 +166,17 @@ export default function AddBonusModal({ isOpen, onClose, onAdd }: AddBonusModalP
           <Button 
             onClick={onClose} 
             color="inherit" 
-            variant="outlined"
+            variant="text"
             size="small"
             sx={{ 
               flex: { xs: 1, sm: 'auto' },
               py: { xs: 1, sm: 0.75 },
               px: { xs: 1.5, sm: 2 },
-              borderRadius: 1,
-              borderColor: 'rgba(0, 0, 0, 0.2)',
               fontSize: '0.8125rem',
+              textTransform: 'none',
               '&:hover': {
-                borderColor: '#64748b',
-                background: 'rgba(0, 0, 0, 0.04)',
+                background: 'transparent',
+                textDecoration: 'underline',
               }
             }}
           >
@@ -186,18 +184,18 @@ export default function AddBonusModal({ isOpen, onClose, onAdd }: AddBonusModalP
           </Button>
           <Button 
             type="submit" 
-            variant="contained" 
-            color="success"
+            variant="text"
             size="small"
             sx={{ 
               flex: { xs: 1, sm: 'auto' },
               py: { xs: 1, sm: 0.75 },
               px: { xs: 1.5, sm: 2 },
-              borderRadius: 1,
-              background: '#10b981',
               fontSize: '0.8125rem',
+              textTransform: 'none',
+              color: '#10b981',
               '&:hover': {
-                background: '#059669',
+                background: 'transparent',
+                textDecoration: 'underline',
               }
             }}
           >

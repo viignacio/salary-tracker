@@ -180,7 +180,7 @@ export default function Home() {
       <Box height="100vh" display="flex" alignItems="center" justifyContent="center" bgcolor="#f5f5f5">
         <Box textAlign="center">
           <CircularProgress color="primary" />
-          <Typography mt={2} color="text.secondary">Checking authentication...</Typography>
+          <Typography mt={2} color="text.secondary" sx={{ fontFamily: 'monospace' }}>Checking authentication...</Typography>
         </Box>
       </Box>
     )
@@ -191,7 +191,7 @@ export default function Home() {
       <Box height="100vh" display="flex" alignItems="center" justifyContent="center" bgcolor="#f5f5f5">
         <Box textAlign="center">
           <CircularProgress color="primary" />
-          <Typography mt={2} color="text.secondary">Loading...</Typography>
+          <Typography mt={2} color="text.secondary" sx={{ fontFamily: 'monospace' }}>Loading...</Typography>
         </Box>
       </Box>
     )
@@ -218,11 +218,7 @@ export default function Home() {
         <Box 
           mb={{ xs: 2, sm: 3 }}
           sx={{
-            background: '#ffffff',
-            borderRadius: 1,
-            p: { xs: 2, sm: 2.5 },
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-            border: '1px solid rgba(0, 0, 0, 0.08)',
+            p: 0,
           }}
         >
           <Box 
@@ -240,7 +236,8 @@ export default function Home() {
                   fontSize: { xs: '1.25rem', sm: '1.5rem' },
                   lineHeight: 1.3,
                   color: '#1e293b',
-                  mb: 0.5
+                  mb: 0.5,
+                  fontFamily: 'monospace',
                 }}
               >
                 Claver GC Salary Tracker
@@ -249,14 +246,15 @@ export default function Home() {
                 sx={{ 
                   fontSize: { xs: '0.75rem', sm: '0.875rem' },
                   fontWeight: 400,
-                  color: '#64748b'
+                  color: '#64748b',
+                  fontFamily: 'monospace',
                 }}
               >
                 Manage monthly salaries and deductions for your household helpers
               </Typography>
             </Box>
             <Button
-              variant="outlined"
+              variant="text"
               size="small"
               startIcon={<LogoutIcon />}
               onClick={handleLogout}
@@ -264,14 +262,14 @@ export default function Home() {
                 minWidth: { xs: 'auto', sm: 100 },
                 px: { xs: 1.5, sm: 2 },
                 py: { xs: 1, sm: 1 },
-                borderRadius: 1,
-                borderColor: 'rgba(239, 68, 68, 0.3)',
                 color: '#dc2626',
                 fontWeight: 600,
                 fontSize: '0.8125rem',
+                fontFamily: 'monospace',
+                textTransform: 'none',
                 '&:hover': {
-                  borderColor: '#dc2626',
-                  background: 'rgba(239, 68, 68, 0.06)',
+                  background: 'transparent',
+                  textDecoration: 'underline',
                 }
               }}
             >
@@ -289,11 +287,7 @@ export default function Home() {
           alignItems={{ xs: 'stretch', sm: 'center' }}
           justifyContent={{ xs: 'stretch', sm: 'space-between' }}
           sx={{
-            background: '#ffffff',
-            borderRadius: 1,
-            p: { xs: 1.5, sm: 2 },
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-            border: '1px solid rgba(0, 0, 0, 0.08)',
+            p: 0,
           }}
         >
           <Box sx={{ display: { xs: 'none', sm: 'block' }, flex: 1 }} />
@@ -305,7 +299,7 @@ export default function Home() {
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', flex: 1 }}>
             <Button
-            variant="contained"
+            variant="text"
             size="small"
             startIcon={<AddIcon />}
             onClick={() => setShowAddHelper(true)}
@@ -314,11 +308,13 @@ export default function Home() {
               fontWeight: 600,
               py: { xs: 1, sm: 1 },
               px: { xs: 1.5, sm: 2 },
-              borderRadius: 1,
-              background: '#6366f1',
               fontSize: '0.8125rem',
+              fontFamily: 'monospace',
+              textTransform: 'none',
+              color: '#1e293b',
               '&:hover': {
-                background: '#4f46e5',
+                background: 'transparent',
+                textDecoration: 'underline',
               }
             }}
           >
@@ -333,10 +329,7 @@ export default function Home() {
             textAlign="center" 
             py={{ xs: 6, sm: 8 }}
             sx={{
-              background: '#ffffff',
-              borderRadius: 1,
-              border: '1px solid rgba(0, 0, 0, 0.08)',
-              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+              p: 0,
             }}
           >
             <Box
@@ -359,19 +352,19 @@ export default function Home() {
               fontWeight={600} 
               color="text.primary" 
               mb={1}
-              sx={{ fontSize: { xs: '1rem', sm: '1.125rem' } }}
+              sx={{ fontSize: { xs: '1rem', sm: '1.125rem' }, fontFamily: 'monospace' }}
             >
               No helpers added yet
             </Typography>
             <Typography 
               color="text.secondary" 
               mb={3}
-              sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+              sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' }, fontFamily: 'monospace' }}
             >
               Get started by adding your first household helper
             </Typography>
             <Button
-              variant="contained"
+              variant="text"
               size="small"
               startIcon={<AddIcon />}
               onClick={() => setShowAddHelper(true)}
@@ -380,11 +373,13 @@ export default function Home() {
                 fontWeight: 600,
                 py: { xs: 1, sm: 1 },
                 px: { xs: 1.5, sm: 2 },
-                borderRadius: 1,
-                background: '#6366f1',
                 fontSize: '0.8125rem',
+                fontFamily: 'monospace',
+                textTransform: 'none',
+                color: '#1e293b',
                 '&:hover': {
-                  background: '#4f46e5',
+                  background: 'transparent',
+                  textDecoration: 'underline',
                 }
               }}
             >

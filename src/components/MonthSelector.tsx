@@ -57,10 +57,6 @@ export default function MonthSelector({ selectedMonth, onMonthChange }: MonthSel
       {/* Mobile layout: xs only */}
       <Box
         sx={{
-          background: '#ffffff',
-          borderRadius: 1,
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-          border: '1px solid rgba(0, 0, 0, 0.08)',
           minHeight: 40,
           px: 0,
           position: 'relative',
@@ -80,7 +76,7 @@ export default function MonthSelector({ selectedMonth, onMonthChange }: MonthSel
             zIndex: 2,
             color: '#64748b',
             '&:hover': {
-              background: 'rgba(0, 0, 0, 0.04)',
+              background: 'transparent',
               color: '#475569',
             }
           }}
@@ -89,6 +85,7 @@ export default function MonthSelector({ selectedMonth, onMonthChange }: MonthSel
         </IconButton>
         <Button
           size="small"
+          variant="text"
           startIcon={<CalendarMonthIcon fontSize="small" />}
           onClick={handleMenuOpen}
           sx={{
@@ -98,15 +95,16 @@ export default function MonthSelector({ selectedMonth, onMonthChange }: MonthSel
             px: 1.5,
             py: 1,
             fontSize: '0.8125rem',
+            fontFamily: 'monospace',
             minHeight: 40,
             position: 'absolute',
             left: '50%',
             top: '50%',
             transform: 'translate(-50%, -50%)',
             zIndex: 1,
-            borderRadius: 1,
             '&:hover': {
-              background: 'rgba(0, 0, 0, 0.04)',
+              background: 'transparent',
+              textDecoration: 'underline',
             }
           }}
         >
@@ -120,11 +118,10 @@ export default function MonthSelector({ selectedMonth, onMonthChange }: MonthSel
             sx: {
               maxHeight: 300,
               minWidth: 200,
-              borderRadius: 3,
-              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              background: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(20px)',
+              borderRadius: 1,
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+              border: '1px solid rgba(0, 0, 0, 0.08)',
+              background: '#ffffff',
             },
           }}
         >
@@ -133,7 +130,7 @@ export default function MonthSelector({ selectedMonth, onMonthChange }: MonthSel
               variant="subtitle2"
               color="text.secondary"
               mb={1}
-              sx={{ fontSize: '0.75rem' }}
+              sx={{ fontSize: '0.75rem', fontFamily: 'monospace' }}
             >
               Recent Months
             </Typography>
@@ -146,6 +143,7 @@ export default function MonthSelector({ selectedMonth, onMonthChange }: MonthSel
               sx={{
                 py: 1.5,
                 fontSize: '0.875rem',
+                fontFamily: 'monospace',
               }}
             >
               {month.label}
@@ -164,7 +162,7 @@ export default function MonthSelector({ selectedMonth, onMonthChange }: MonthSel
             zIndex: 2,
             color: '#64748b',
             '&:hover': {
-              background: 'rgba(0, 0, 0, 0.04)',
+              background: 'transparent',
               color: '#475569',
             }
           }}
@@ -175,10 +173,6 @@ export default function MonthSelector({ selectedMonth, onMonthChange }: MonthSel
       {/* Desktop layout: sm and up only */}
       <Box
         sx={{
-          background: '#ffffff',
-          borderRadius: 1,
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-          border: '1px solid rgba(0, 0, 0, 0.08)',
           minHeight: 36,
           px: 0.75,
           display: { xs: 'none', sm: 'flex' },
@@ -194,10 +188,9 @@ export default function MonthSelector({ selectedMonth, onMonthChange }: MonthSel
             p: 0.5,
             minWidth: 32,
             minHeight: 32,
-            borderRadius: 1,
             color: '#64748b',
             '&:hover': {
-              background: 'rgba(0, 0, 0, 0.04)',
+              background: 'transparent',
               color: '#475569',
             }
           }}
@@ -206,6 +199,7 @@ export default function MonthSelector({ selectedMonth, onMonthChange }: MonthSel
         </IconButton>
         <Button
           size="small"
+          variant="text"
           startIcon={<CalendarMonthIcon fontSize="small" />}
           onClick={handleMenuOpen}
           sx={{
@@ -215,11 +209,12 @@ export default function MonthSelector({ selectedMonth, onMonthChange }: MonthSel
             px: 1.5,
             py: 0.5,
             fontSize: '0.8125rem',
+            fontFamily: 'monospace',
             minHeight: 36,
             mx: 0.5,
-            borderRadius: 1,
             '&:hover': {
-              background: 'rgba(0, 0, 0, 0.04)',
+              background: 'transparent',
+              textDecoration: 'underline',
             }
           }}
         >
@@ -233,11 +228,10 @@ export default function MonthSelector({ selectedMonth, onMonthChange }: MonthSel
             sx: {
               maxHeight: 400,
               minWidth: 250,
-              borderRadius: 3,
-              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              background: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(20px)',
+              borderRadius: 1,
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+              border: '1px solid rgba(0, 0, 0, 0.08)',
+              background: '#ffffff',
             },
           }}
         >
@@ -246,7 +240,7 @@ export default function MonthSelector({ selectedMonth, onMonthChange }: MonthSel
               variant="subtitle2"
               color="text.secondary"
               mb={1}
-              sx={{ fontSize: '0.875rem' }}
+              sx={{ fontSize: '0.875rem', fontFamily: 'monospace' }}
             >
               Recent Months
             </Typography>
@@ -259,6 +253,7 @@ export default function MonthSelector({ selectedMonth, onMonthChange }: MonthSel
               sx={{
                 py: 1,
                 fontSize: '1rem',
+                fontFamily: 'monospace',
               }}
             >
               {month.label}
@@ -272,10 +267,9 @@ export default function MonthSelector({ selectedMonth, onMonthChange }: MonthSel
             p: 0.5,
             minWidth: 32,
             minHeight: 32,
-            borderRadius: 1,
             color: '#64748b',
             '&:hover': {
-              background: 'rgba(0, 0, 0, 0.04)',
+              background: 'transparent',
               color: '#475569',
             }
           }}

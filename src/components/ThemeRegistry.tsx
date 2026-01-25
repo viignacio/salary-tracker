@@ -119,10 +119,10 @@ const theme = createTheme({
           border: '1px solid rgba(255, 255, 255, 0.1)',
           backdropFilter: 'blur(10px)',
           background: 'rgba(255, 255, 255, 0.9)',
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          transition: 'none',
           '&:hover': {
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-            transform: 'translateY(-2px)',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+            transform: 'none',
           },
         },
       },
@@ -135,10 +135,10 @@ const theme = createTheme({
           fontWeight: 600,
           textTransform: 'none',
           boxShadow: 'none',
-          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+          transition: 'none',
           '&:hover': {
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-            transform: 'translateY(-1px)',
+            boxShadow: 'none',
+            transform: 'none',
           },
         },
         contained: {

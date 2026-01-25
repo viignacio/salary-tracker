@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { format } from 'date-fns'
 import AddDeductionModal from './AddDeductionModal'
 import AddBonusModal from './AddBonusModal'
-import { Card, CardContent, Typography, Button, IconButton, TextField, Box, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Stack } from '@mui/material'
+import { Card, CardContent, Typography, Button, IconButton, TextField, Box, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Stack, Tooltip } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import AddIcon from '@mui/icons-material/Add'
 import DownloadIcon from '@mui/icons-material/Download'
@@ -765,23 +765,42 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
                   mb={0}
                   sx={{ height: '24px', lineHeight: '24px' }}
                 >
-                  <Typography 
-                    sx={{ 
-                      fontSize: { xs: '0.8125rem', sm: '0.875rem' },
-                      color: '#1e293b',
-                      fontFamily: 'monospace',
-                      lineHeight: '24px',
-                      m: 0,
-                      p: 0,
-                      mt: 0,
-                      mb: 0,
-                      pt: 0,
-                      pb: 0,
-                      height: '24px',
-                    }}
-                  >
-                    {deduction.purpose} - ₱{deduction.amount.toFixed(2)} ({format(new Date(deduction.date), 'MMM dd')})
-                  </Typography>
+                  <Box display="flex" alignItems="center" gap={0.5} sx={{ flex: 1, minWidth: 0, lineHeight: '24px' }}>
+                    <Tooltip title={deduction.purpose} arrow>
+                      <Typography 
+                        sx={{ 
+                          fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+                          color: '#1e293b',
+                          fontFamily: 'monospace',
+                          lineHeight: '24px',
+                          m: 0,
+                          p: 0,
+                          height: '24px',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                          flexShrink: 1,
+                          minWidth: 0,
+                        }}
+                      >
+                        {deduction.purpose}
+                      </Typography>
+                    </Tooltip>
+                    <Typography 
+                      sx={{ 
+                        fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+                        color: '#1e293b',
+                        fontFamily: 'monospace',
+                        lineHeight: '24px',
+                        m: 0,
+                        p: 0,
+                        height: '24px',
+                        flexShrink: 0,
+                      }}
+                    >
+                      - ₱{deduction.amount.toFixed(2)} ({format(new Date(deduction.date), 'MMM dd')})
+                    </Typography>
+                  </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', pr: '16px' }}>
                     <IconButton
                       size="small"
@@ -898,7 +917,28 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
                   mb={0}
                   sx={{ height: '24px', lineHeight: '24px' }}
                 >
-                  <Box display="flex" alignItems="center" gap={0} sx={{ lineHeight: '24px' }}>
+                  <Box display="flex" alignItems="center" gap={0.5} sx={{ lineHeight: '24px', flex: 1, minWidth: 0 }}>
+                    <Tooltip title={bonus.purpose} arrow>
+                      <Typography 
+                        sx={{ 
+                          fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+                          color: bonus.given ? '#94a3b8' : '#1e293b',
+                          fontFamily: 'monospace',
+                          textDecoration: bonus.given ? 'line-through' : 'none',
+                          lineHeight: '24px',
+                          m: 0,
+                          p: 0,
+                          height: '24px',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                          flexShrink: 1,
+                          minWidth: 0,
+                        }}
+                      >
+                        {bonus.purpose}
+                      </Typography>
+                    </Tooltip>
                     <Typography 
                       sx={{ 
                         fontSize: { xs: '0.8125rem', sm: '0.875rem' },
@@ -908,14 +948,11 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
                         lineHeight: '24px',
                         m: 0,
                         p: 0,
-                        mt: 0,
-                        mb: 0,
-                        pt: 0,
-                        pb: 0,
                         height: '24px',
+                        flexShrink: 0,
                       }}
                     >
-                      {bonus.purpose} - ₱{bonus.amount.toFixed(2)} ({format(new Date(bonus.date), 'MMM dd')})
+                      - ₱{bonus.amount.toFixed(2)} ({format(new Date(bonus.date), 'MMM dd')})
                     </Typography>
                     {bonus.given && (
                       <Typography 

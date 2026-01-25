@@ -57,62 +57,56 @@ export default function MonthSelector({ selectedMonth, onMonthChange }: MonthSel
       {/* Mobile layout: xs only */}
       <Box
         sx={{
-          background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%)',
-          backdropFilter: 'blur(10px)',
-          borderRadius: 3,
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          minHeight: 56,
+          background: '#ffffff',
+          borderRadius: 1,
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+          border: '1px solid rgba(0, 0, 0, 0.08)',
+          minHeight: 40,
           px: 0,
           position: 'relative',
           display: { xs: 'block', sm: 'none' },
           width: '100%',
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          '&:hover': {
-            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
-            transform: 'translateY(-1px)',
-          }
         }}
       >
         <IconButton
           onClick={handlePreviousMonth}
-          color="primary"
+          size="small"
           sx={{
             position: 'absolute',
             left: 4,
             top: '50%',
             transform: 'translateY(-50%)',
-            p: 1.5,
-            minWidth: 48,
-            minHeight: 48,
+            p: 0.75,
             zIndex: 2,
-            background: 'rgba(99, 102, 241, 0.1)',
+            color: '#64748b',
             '&:hover': {
-              background: 'rgba(99, 102, 241, 0.2)',
+              background: 'rgba(0, 0, 0, 0.04)',
+              color: '#475569',
             }
           }}
         >
-          <ChevronLeftIcon />
+          <ChevronLeftIcon fontSize="small" />
         </IconButton>
         <Button
-          startIcon={<CalendarMonthIcon />}
+          size="small"
+          startIcon={<CalendarMonthIcon fontSize="small" />}
           onClick={handleMenuOpen}
           sx={{
             textTransform: 'none',
             fontWeight: 600,
-            color: 'rgba(255, 255, 255, 0.9)',
-            px: 2,
-            py: 1.5,
-            fontSize: '0.875rem',
-            minHeight: 56,
+            color: '#1e293b',
+            px: 1.5,
+            py: 1,
+            fontSize: '0.8125rem',
+            minHeight: 40,
             position: 'absolute',
             left: '50%',
             top: '50%',
             transform: 'translate(-50%, -50%)',
             zIndex: 1,
-            borderRadius: 2,
+            borderRadius: 1,
             '&:hover': {
-              background: 'rgba(99, 102, 241, 0.2)',
+              background: 'rgba(0, 0, 0, 0.04)',
             }
           }}
         >
@@ -160,77 +154,72 @@ export default function MonthSelector({ selectedMonth, onMonthChange }: MonthSel
         </Menu>
         <IconButton
           onClick={handleNextMonth}
-          color="primary"
+          size="small"
           sx={{
             position: 'absolute',
             right: 4,
             top: '50%',
             transform: 'translateY(-50%)',
-            p: 1.5,
-            minWidth: 48,
-            minHeight: 48,
+            p: 0.75,
             zIndex: 2,
-            background: 'rgba(99, 102, 241, 0.1)',
+            color: '#64748b',
             '&:hover': {
-              background: 'rgba(99, 102, 241, 0.2)',
+              background: 'rgba(0, 0, 0, 0.04)',
+              color: '#475569',
             }
           }}
         >
-          <ChevronRightIcon />
+          <ChevronRightIcon fontSize="small" />
         </IconButton>
       </Box>
       {/* Desktop layout: sm and up only */}
       <Box
         sx={{
-          background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%)',
-          backdropFilter: 'blur(10px)',
-          borderRadius: 3,
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          minHeight: 48,
-          px: 1,
+          background: '#ffffff',
+          borderRadius: 1,
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+          border: '1px solid rgba(0, 0, 0, 0.08)',
+          minHeight: 36,
+          px: 0.75,
           display: { xs: 'none', sm: 'flex' },
           alignItems: 'center',
           minWidth: 0,
           maxWidth: 'none',
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          '&:hover': {
-            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
-            transform: 'translateY(-1px)',
-          }
         }}
       >
         <IconButton
           onClick={handlePreviousMonth}
-          color="primary"
+          size="small"
           sx={{
-            p: 1,
-            minWidth: 40,
-            minHeight: 40,
-            borderRadius: 2,
-            background: 'rgba(99, 102, 241, 0.1)',
+            p: 0.5,
+            minWidth: 32,
+            minHeight: 32,
+            borderRadius: 1,
+            color: '#64748b',
             '&:hover': {
-              background: 'rgba(99, 102, 241, 0.2)',
+              background: 'rgba(0, 0, 0, 0.04)',
+              color: '#475569',
             }
           }}
         >
-          <ChevronLeftIcon />
+          <ChevronLeftIcon fontSize="small" />
         </IconButton>
         <Button
-          startIcon={<CalendarMonthIcon />}
+          size="small"
+          startIcon={<CalendarMonthIcon fontSize="small" />}
           onClick={handleMenuOpen}
           sx={{
             textTransform: 'none',
             fontWeight: 600,
-            color: 'rgba(255, 255, 255, 0.9)',
-            px: 2,
-            py: 1,
-            fontSize: '1rem',
-            minHeight: 40,
-            mx: 1,
-            borderRadius: 2,
+            color: '#1e293b',
+            px: 1.5,
+            py: 0.5,
+            fontSize: '0.8125rem',
+            minHeight: 36,
+            mx: 0.5,
+            borderRadius: 1,
             '&:hover': {
-              background: 'rgba(99, 102, 241, 0.2)',
+              background: 'rgba(0, 0, 0, 0.04)',
             }
           }}
         >
@@ -278,19 +267,20 @@ export default function MonthSelector({ selectedMonth, onMonthChange }: MonthSel
         </Menu>
         <IconButton
           onClick={handleNextMonth}
-          color="primary"
+          size="small"
           sx={{
-            p: 1,
-            minWidth: 40,
-            minHeight: 40,
-            borderRadius: 2,
-            background: 'rgba(99, 102, 241, 0.1)',
+            p: 0.5,
+            minWidth: 32,
+            minHeight: 32,
+            borderRadius: 1,
+            color: '#64748b',
             '&:hover': {
-              background: 'rgba(99, 102, 241, 0.2)',
+              background: 'rgba(0, 0, 0, 0.04)',
+              color: '#475569',
             }
           }}
         >
-          <ChevronRightIcon />
+          <ChevronRightIcon fontSize="small" />
         </IconButton>
       </Box>
     </>

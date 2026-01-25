@@ -37,11 +37,10 @@ export default function AddDeductionModal({ isOpen, onClose, onAdd }: AddDeducti
         sx: {
           mx: { xs: 2, sm: 'auto' },
           width: { xs: 'calc(100% - 32px)', sm: 'auto' },
-          background: 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(20px)',
-          borderRadius: 4,
-          boxShadow: '0 25px 50px rgba(0, 0, 0, 0.25)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
+          background: '#ffffff',
+          borderRadius: 1,
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+          border: '1px solid rgba(0, 0, 0, 0.08)',
         }
       }}
     >
@@ -51,15 +50,12 @@ export default function AddDeductionModal({ isOpen, onClose, onAdd }: AddDeducti
           alignItems: 'center', 
           justifyContent: 'space-between', 
           pr: { xs: 1, sm: 1 },
-          px: { xs: 3, sm: 4 },
-          py: { xs: 3, sm: 3 },
+          px: { xs: 2, sm: 2.5 },
+          py: { xs: 2, sm: 2 },
           borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
-          fontSize: '1.25rem',
-          fontWeight: 700,
-          background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
-          backgroundClip: 'text',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
+          fontSize: '1rem',
+          fontWeight: 600,
+          color: '#dc2626',
         }}
       >
         Add Deduction
@@ -79,9 +75,9 @@ export default function AddDeductionModal({ isOpen, onClose, onAdd }: AddDeducti
       <form onSubmit={handleSubmit}>
         <DialogContent 
           sx={{ 
-            px: { xs: 3, sm: 4 }, 
-            pt: { xs: 3, sm: 4 }, 
-            pb: { xs: 2, sm: 3 } 
+            px: { xs: 2, sm: 2.5 }, 
+            pt: { xs: 2, sm: 2.5 }, 
+            pb: { xs: 1.5, sm: 2 } 
           }}
         >
           <Stack spacing={{ xs: 2, sm: 2.5 }}>
@@ -138,9 +134,9 @@ export default function AddDeductionModal({ isOpen, onClose, onAdd }: AddDeducti
         </DialogContent>
         <DialogActions 
           sx={{ 
-            px: { xs: 3, sm: 4 }, 
-            pb: { xs: 3, sm: 4 }, 
-            pt: { xs: 2, sm: 3 },
+            px: { xs: 2, sm: 2.5 }, 
+            pb: { xs: 2, sm: 2.5 }, 
+            pt: { xs: 1.5, sm: 2 },
             gap: { xs: 1, sm: 1 },
             borderTop: '1px solid rgba(0, 0, 0, 0.08)',
           }}
@@ -149,14 +145,17 @@ export default function AddDeductionModal({ isOpen, onClose, onAdd }: AddDeducti
             onClick={onClose} 
             color="inherit" 
             variant="outlined"
+            size="small"
             sx={{ 
               flex: { xs: 1, sm: 'auto' },
-              py: { xs: 1.5, sm: 1 },
-              borderRadius: 2,
+              py: { xs: 1, sm: 0.75 },
+              px: { xs: 1.5, sm: 2 },
+              borderRadius: 1,
               borderColor: 'rgba(0, 0, 0, 0.2)',
+              fontSize: '0.8125rem',
               '&:hover': {
                 borderColor: '#64748b',
-                background: 'rgba(100, 116, 139, 0.05)',
+                background: 'rgba(0, 0, 0, 0.04)',
               }
             }}
           >
@@ -166,14 +165,16 @@ export default function AddDeductionModal({ isOpen, onClose, onAdd }: AddDeducti
             type="submit" 
             variant="contained" 
             color="error"
+            size="small"
             sx={{ 
               flex: { xs: 1, sm: 'auto' },
-              py: { xs: 1.5, sm: 1 },
-              borderRadius: 2,
-              background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+              py: { xs: 1, sm: 0.75 },
+              px: { xs: 1.5, sm: 2 },
+              borderRadius: 1,
+              background: '#dc2626',
+              fontSize: '0.8125rem',
               '&:hover': {
-                background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
-                transform: 'translateY(-1px)',
+                background: '#b91c1c',
               }
             }}
           >

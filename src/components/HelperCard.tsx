@@ -4,16 +4,11 @@ import { useState, useEffect, useMemo } from 'react'
 import { format } from 'date-fns'
 import AddDeductionModal from './AddDeductionModal'
 import AddBonusModal from './AddBonusModal'
-import { Card, CardContent, Typography, Button, IconButton, TextField, Divider, List, ListItem, Box, Chip, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Stack } from '@mui/material'
+import { Card, CardContent, Typography, Button, IconButton, TextField, Box, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Stack } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
 import AddIcon from '@mui/icons-material/Add'
 import DownloadIcon from '@mui/icons-material/Download'
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import WarningAmberIcon from '@mui/icons-material/WarningAmber'
-import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked'
 import React from 'react'
 
 interface InvalidMonth {
@@ -420,54 +415,79 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
 
   return (
     <Card elevation={0} sx={{ 
-      borderRadius: 4, 
+      borderRadius: 1, 
       width: '100%',
       maxWidth: '100%',
       minWidth: 0,
-      height: '100%', // Make card take full height
+      height: '100%',
       display: 'flex',
       flexDirection: 'column',
-      background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%)',
-      backdropFilter: 'blur(20px)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
-      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-      '&:hover': {
-        transform: 'translateY(-4px)',
-        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4)',
+      background: '#fefefe',
+      border: '1px solid rgba(0, 0, 0, 0.08)',
+      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+      position: 'relative',
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        left: '32px',
+        top: 0,
+        bottom: 0,
+        width: '1px',
+        background: 'rgba(0, 0, 0, 0.1)',
+        zIndex: 1,
+      },
+      '&::after': {
+        content: '""',
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        backgroundImage: 'repeating-linear-gradient(transparent, transparent 23px, rgba(0, 0, 0, 0.05) 23px, rgba(0, 0, 0, 0.05) 24px)',
+        pointerEvents: 'none',
+        zIndex: 0,
       }
     }}>
       <CardContent sx={{ 
-        p: { xs: 3, sm: 4 },
+        p: 0,
+        pl: { xs: '4rem', sm: '4.5rem' },
+        pr: { xs: '1.5rem', sm: '2rem' },
+        pt: 0,
+        pb: 0,
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
         flex: 1,
+        position: 'relative',
+        zIndex: 2,
+        fontFamily: 'monospace',
+        lineHeight: '24px',
       }}>
         {/* Invalid Month Banner */}
         {invalidMonth && (
           <Alert 
             severity="warning" 
-            icon={<WarningAmberIcon />} 
+            icon={<WarningAmberIcon fontSize="small" />} 
             sx={{ 
-              mb: 3,
-              borderRadius: 2,
-              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.1) 100%)',
-              border: '1px solid rgba(245, 158, 11, 0.4)',
-              color: 'rgba(255, 255, 255, 0.9)',
+              mb: 0,
+              borderRadius: 1,
+              background: 'rgba(245, 158, 11, 0.08)',
+              border: '1px solid rgba(245, 158, 11, 0.2)',
+              color: '#92400e',
+              py: 0,
+              lineHeight: '24px',
               '& .MuiAlert-icon': {
-                color: '#fbbf24',
-                alignSelf: 'center',
+                color: '#d97706',
               },
               '& .MuiAlert-message': {
-                color: 'rgba(255, 255, 255, 0.9)',
+                fontSize: '0.75rem',
+                lineHeight: '24px',
+                fontFamily: 'monospace',
               }
             }}
           >
-            <strong>This month is marked as invalid.</strong>
-            {invalidMonth.reason && (
-              <><br />Reason: {invalidMonth.reason}</>
-            )}
+            <strong style={{ fontFamily: 'monospace' }}>Invalid month.</strong>
+            {invalidMonth.reason && <span style={{ fontFamily: 'monospace' }}> {invalidMonth.reason}</span>}
           </Alert>
         )}
         {/* Header */}
@@ -476,45 +496,51 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
           flexDirection={{ xs: 'row', sm: 'row' }}
           alignItems={{ xs: 'center', sm: 'center' }} 
           justifyContent="space-between" 
-          gap={{ xs: 1, sm: 0 }}
-          mb={3}
-          pb={2}
-          borderBottom="1px solid rgba(255, 255, 255, 0.1)"
+          gap={0}
+          mb={0}
+          pb={0}
+          sx={{ height: '24px', lineHeight: '24px', mt: '24px' }}
         >
           <Typography 
-            variant="h5" 
-            fontWeight={700}
+            variant="h6" 
+            fontWeight={600}
             sx={{ 
-              fontSize: { xs: '1.25rem', sm: '1.5rem' },
-              background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              fontSize: { xs: '1rem', sm: '1.125rem' },
+              color: '#1e293b',
+              fontFamily: 'monospace',
+              lineHeight: '24px',
+              m: 0,
+              p: 0,
+              mt: 0,
+              mb: 0,
+              pt: 0,
+              pb: 0,
+              height: '24px',
             }}
           >
             {helper.name}
           </Typography>
           <Box sx={{ ml: 'auto', display: 'flex', justifyContent: { xs: 'flex-end', sm: 'flex-end' } }}>
-            <Button
-              variant="outlined"
+            <IconButton
               size="small"
-              startIcon={<DownloadIcon />}
               onClick={handleExportCSV}
               sx={{ 
-                fontWeight: 600,
-                minWidth: { xs: 'auto', sm: 'auto' },
-                px: { xs: 1.5, sm: 2 },
-                borderRadius: 2,
-                borderColor: 'rgba(99, 102, 241, 0.3)',
-                color: '#6366f1',
+                p: 0.25,
+                color: '#64748b',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '24px',
+                height: '24px',
+                minWidth: '24px',
                 '&:hover': {
-                  borderColor: '#6366f1',
-                  background: 'rgba(99, 102, 241, 0.05)',
+                  background: 'rgba(0, 0, 0, 0.04)',
+                  color: '#475569',
                 }
               }}
             >
-              Export
-            </Button>
+              <DownloadIcon sx={{ fontSize: '20px', width: '20px', height: '20px' }} />
+            </IconButton>
           </Box>
         </Box>
         
@@ -524,7 +550,15 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
             display: 'flex',
             flexDirection: 'column',
             height: '100%',
-            gap: 3,
+            gap: 0,
+            m: 0,
+            p: 0,
+            mt: 0,
+            mb: 0,
+            pt: 0,
+            pb: 0,
+            marginBottom: 0,
+            paddingBottom: 0,
           }}
         >
           {/* Scrollable Content Area */}
@@ -532,62 +566,28 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
             sx={{
               display: 'flex',
               flexDirection: 'column',
-              gap: 3,
+              gap: 0,
               flex: 1,
-              minHeight: 0, // Allow shrinking
+              minHeight: 0,
+              m: 0,
+              p: 0,
+              mt: 0,
+              mb: 0,
+              pt: 0,
+              pb: 0,
+              marginBottom: 0,
+              paddingBottom: 0,
             }}
           >
         {/* Salary Section */}
-        <Box 
-          p={3}
-          sx={{
-            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.08) 100%)',
-            borderRadius: 3,
-            border: '1px solid rgba(16, 185, 129, 0.3)',
-          }}
-        >
-          <Box 
-            display="flex" 
-            flexDirection="row"
-            alignItems="center"
-            gap={1}
-            mb={2}
-          >
-            <Typography 
-              variant="subtitle1" 
-              fontWeight={600}
-              sx={{ 
-                fontSize: { xs: '0.875rem', sm: '1rem' },
-                color: '#059669',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em'
-              }}
-            >
-              Monthly Salary
-            </Typography>
-            {!isEditingSalary && (
-              <IconButton 
-                color="primary" 
-                onClick={() => setIsEditingSalary(true)} 
-                size="small" 
-                sx={{ 
-                  ml: 0,
-                  background: 'rgba(99, 102, 241, 0.1)',
-                  '&:hover': {
-                    background: 'rgba(99, 102, 241, 0.2)',
-                  }
-                }}
-              >
-                <EditIcon fontSize="small" />
-              </IconButton>
-            )}
-          </Box>
+        <Box mb={0} pb={0} mt={0} pt={0} sx={{ height: '24px', lineHeight: '24px', paddingBottom: 0, marginBottom: 0, paddingTop: 0, marginTop: 0, mb: '24px' }}>
           {isEditingSalary ? (
             <Box 
               display="flex" 
               flexDirection={{ xs: 'column', sm: 'row' }}
               alignItems={{ xs: 'stretch', sm: 'center' }} 
-              gap={{ xs: 1, sm: 1 }}
+              gap={0}
+              sx={{ m: 0, p: 0 }}
             >
               <TextField
                 type="number"
@@ -600,622 +600,517 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
                 inputProps={{ min: 0, step: 0.01 }}
                 sx={{ 
                   flex: 1,
-                  '& .MuiOutlinedInput-input': {
-                    color: 'text.primary',
-                    fontWeight: 500,
-                  },
+                  fontFamily: 'monospace',
                   '& .MuiOutlinedInput-root': {
-                    backgroundColor: 'background.paper',
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'primary.main',
-                    },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'primary.main',
-                      borderWidth: 2,
-                    },
-                  },
-                  '& .MuiInputLabel-root': {
-                    color: 'text.secondary',
-                  },
+                    fontSize: '0.875rem',
+                    fontFamily: 'monospace',
+                  }
                 }}
               />
               <Box 
                 display="flex" 
-                gap={1}
+                gap={0}
                 sx={{ flexDirection: { xs: 'row', sm: 'row' } }}
               >
                 <Button 
-                  variant="contained" 
-                  color="primary" 
+                  variant="text" 
+                  size="small"
                   onClick={() => handleSalaryUpdate(isNaN(salary) ? 0 : salary)}
-                  sx={{ flex: { xs: 1, sm: 'auto' } }}
+                  sx={{ 
+                    flex: { xs: 1, sm: 'auto' },
+                    py: 0.25,
+                    px: 1,
+                    fontSize: '0.75rem',
+                    fontFamily: 'monospace',
+                    minWidth: 'auto',
+                    textTransform: 'none',
+                  }}
                 >
                   Save
                 </Button>
                 <Button 
-                  variant="outlined" 
-                  color="inherit" 
+                  variant="text" 
+                  size="small"
                   onClick={() => setIsEditingSalary(false)}
-                  sx={{ flex: { xs: 1, sm: 'auto' } }}
+                  sx={{ 
+                    flex: { xs: 1, sm: 'auto' },
+                    py: 0.25,
+                    px: 1,
+                    fontSize: '0.75rem',
+                    fontFamily: 'monospace',
+                    minWidth: 'auto',
+                    textTransform: 'none',
+                  }}
                 >
                   Cancel
                 </Button>
               </Box>
             </Box>
           ) : (
-            <Typography 
-              variant="h4" 
-              color="success.main" 
-              fontWeight={700}
-              sx={{ 
-                fontSize: { xs: '1.75rem', sm: '2rem' },
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                textShadow: '0 2px 4px rgba(16, 185, 129, 0.1)',
-              }}
-            >
-              ₱{salary.toFixed(2)}
-            </Typography>
+            <Box display="flex" alignItems="center" gap={0} sx={{ m: 0, p: 0, lineHeight: '24px' }}>
+              <Typography 
+                sx={{ 
+                  fontSize: { xs: '0.875rem', sm: '0.9375rem' },
+                  color: '#1e293b',
+                  fontFamily: 'monospace',
+                  lineHeight: '24px',
+                  m: 0,
+                  p: 0,
+                  mt: 0,
+                  mb: 0,
+                  pt: 0,
+                  pb: 0,
+                  height: '24px',
+                }}
+              >
+                Salary: ₱{salary.toFixed(2)}
+              </Typography>
+              <IconButton 
+                onClick={() => setIsEditingSalary(true)} 
+                size="small" 
+                sx={{ 
+                  p: 0.25,
+                  ml: 0,
+                  color: '#94a3b8',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                width: '24px',
+                height: '24px',
+                minWidth: '24px',
+                  '&:hover': {
+                    background: 'transparent',
+                    color: '#64748b',
+                  }
+                }}
+              >
+                <EditIcon sx={{ fontSize: '20px', width: '20px', height: '20px' }} />
+              </IconButton>
+            </Box>
           )}
         </Box>
 
         {/* Deductions Section */}
-        <Box 
-          p={3}
-          sx={{
-            background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.08) 100%)',
-            borderRadius: 3,
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            minHeight: 120, // Consistent minimum height
-          }}
-        >
-          <Box 
-            display="flex" 
-            flexDirection={{ xs: 'row', sm: 'row' }}
-            alignItems={{ xs: 'center', sm: 'center' }} 
-            justifyContent="space-between" 
-            gap={{ xs: 1, sm: 0 }}
-            mb={2}
-          >
+        <Box mb={0} pb={0} mt={0} pt={0} sx={{ height: '24px', lineHeight: '24px', paddingBottom: 0, marginBottom: 0, paddingTop: 0, marginTop: '24px' }}>
+          <Box display="flex" alignItems="center" justifyContent="space-between" mb={0} sx={{ height: '24px', lineHeight: '24px', width: '100%' }}>
             <Typography 
-              variant="subtitle1" 
-              fontWeight={600}
               sx={{ 
-                fontSize: { xs: '0.875rem', sm: '1rem' },
-                color: '#dc2626',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em'
+                fontSize: { xs: '0.875rem', sm: '0.9375rem' },
+                color: '#1e293b',
+                fontFamily: 'monospace',
+                lineHeight: '24px',
+                m: 0,
+                p: 0,
+                mt: 0,
+                mb: 0,
+                pt: 0,
+                pb: 0,
+                height: '24px',
               }}
             >
-              Deductions
+              Deductions:
             </Typography>
-            <Box sx={{ ml: 'auto', display: 'flex', justifyContent: { xs: 'flex-end', sm: 'flex-end' } }}>
-              <Button
-                variant="outlined"
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+              <IconButton
                 size="small"
-                color="error"
-                startIcon={<AddIcon />}
                 onClick={() => setShowAddDeduction(true)}
                 sx={{ 
-                  fontWeight: 600,
-                  minWidth: { xs: 'auto', sm: 'auto' },
-                  px: { xs: 1.5, sm: 2 },
-                  borderRadius: 2,
-                  borderColor: 'rgba(239, 68, 68, 0.3)',
+                  p: 0.25,
+                  color: '#94a3b8',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                width: '24px',
+                height: '24px',
+                minWidth: '24px',
                   '&:hover': {
-                    borderColor: '#ef4444',
-                    background: 'rgba(239, 68, 68, 0.05)',
+                    background: 'transparent',
+                    color: '#64748b',
                   }
                 }}
               >
-                Add
-              </Button>
+                <AddIcon sx={{ fontSize: '20px', width: '20px', height: '20px' }} />
+              </IconButton>
             </Box>
           </Box>
           {monthDeductions.length === 0 ? (
-            <Box 
-              textAlign="center" 
-              py={2}
-              sx={{
-                background: 'rgba(239, 68, 68, 0.03)',
-                borderRadius: 2,
-                border: '1px dashed rgba(239, 68, 68, 0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                minHeight: 60,
+            <Typography 
+              sx={{ 
+                fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+                color: '#94a3b8',
+                fontFamily: 'monospace',
+                fontStyle: 'italic',
+                lineHeight: '24px',
+                m: 0,
+                p: 0,
+                mt: 0,
+                mb: 0,
+                pt: 0,
+                pb: 0,
+                height: '24px',
               }}
             >
-              <Typography 
-                color="text.secondary" 
-                fontSize={14}
-                sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
-              >
-                No deductions for this month
-              </Typography>
-            </Box>
+              (none)
+            </Typography>
           ) : (
-            <List dense disablePadding>
-              {monthDeductions.map((deduction, idx) => (
-                <React.Fragment key={deduction.id}>
-                  <ListItem sx={{ pl: 0, pr: 0 }} disableGutters>
-                    <Box
-                      display="flex"
-                      flexDirection="row"
-                      alignItems="flex-start"
-                      width="100%"
-                      gap={1}
+            <Box component="ol" sx={{ pl: 2, m: 0, listStyle: 'decimal' }}>
+              {monthDeductions.map((deduction) => (
+                <Box
+                  key={deduction.id}
+                  component="li"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  mb={0}
+                  sx={{ height: '24px', lineHeight: '24px' }}
+                >
+                  <Typography 
+                    sx={{ 
+                      fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+                      color: '#1e293b',
+                      fontFamily: 'monospace',
+                      lineHeight: '24px',
+                      m: 0,
+                      p: 0,
+                      mt: 0,
+                      mb: 0,
+                      pt: 0,
+                      pb: 0,
+                      height: '24px',
+                    }}
+                  >
+                    {deduction.purpose} - ₱{deduction.amount.toFixed(2)} ({format(new Date(deduction.date), 'MMM dd')})
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', pr: '16px' }}>
+                    <IconButton
+                      size="small"
+                      onClick={async () => {
+                        if (window.confirm('Delete this deduction?')) {
+                          const response = await fetch(`/api/deductions?id=${deduction.id}`, { method: 'DELETE' })
+                          if (response.ok) {
+                            setMonthDeductions(prevDeductions => 
+                              prevDeductions.filter(d => d.id !== deduction.id)
+                            )
+                          }
+                          onUpdate()
+                        }
+                      }}
+                      sx={{ 
+                        p: 0.25,
+                        color: '#94a3b8',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                width: '24px',
+                height: '24px',
+                minWidth: '24px',
+                        '&:hover': {
+                          background: 'transparent',
+                          color: '#dc2626',
+                        }
+                      }}
                     >
-                      {/* Amount+Icon and Date (always column) */}
-                      <Box
-                        display="flex"
-                        flexDirection="column"
-                        alignItems="flex-start"
-                        minWidth={90}
-                        sx={{ mr: { sm: 1 } }}
-                      >
-                        <Box display="flex" alignItems="center" gap={1}>
-                          <RemoveCircleOutlineIcon fontSize="small" color="error" />
-                          <Typography
-                            fontWeight={600}
-                            sx={{ 
-                              fontSize: { xs: '0.875rem', sm: '1rem' },
-                              color: 'rgba(255, 255, 255, 0.9)'
-                            }}
-                          >
-                            ₱{deduction.amount.toFixed(2)}
-                          </Typography>
-                        </Box>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' }, mt: 0.5 }}
-                        >
-                          {format(new Date(deduction.date), 'MMM dd, yyyy')}
-                        </Typography>
-                      </Box>
-                      {/* Reason chip and Delete Icon in same row, vertically centered */}
-                      <Box flex={1} display="flex" alignItems="center" justifyContent="flex-start" gap={1}>
-                        <Chip
-                          label={deduction.purpose}
-                          size="small"
-                          sx={{ 
-                            fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                            color: 'rgba(255, 255, 255, 0.9)',
-                            border: '1px solid rgba(255, 255, 255, 0.2)',
-                            '& .MuiChip-label': {
-                              color: 'rgba(255, 255, 255, 0.9)',
-                              fontWeight: 600
-                            }
-                          }}
-                        />
-                        <Box ml="auto" display="flex" alignItems="center">
-                          <IconButton
-                            edge="end"
-                            aria-label="delete deduction"
-                            sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
-                            onClick={async () => {
-                              if (window.confirm('Delete this deduction?')) {
-                                const response = await fetch(`/api/deductions?id=${deduction.id}`, { method: 'DELETE' })
-                                if (response.ok) {
-                                  // Update local deductions state immediately
-                                  setMonthDeductions(prevDeductions => 
-                                    prevDeductions.filter(d => d.id !== deduction.id)
-                                  )
-                                }
-                                onUpdate()
-                              }
-                            }}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </Box>
-                      </Box>
-                    </Box>
-                  </ListItem>
-                  {idx < monthDeductions.length - 1 && <Divider component="li" sx={{ my: 0.5 }} />}
-                </React.Fragment>
+                      <Typography sx={{ fontSize: '20px', fontFamily: 'monospace', lineHeight: '20px', height: '20px', width: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: 0 }}>×</Typography>
+                    </IconButton>
+                  </Box>
+                </Box>
               ))}
-            </List>
-          )}
-          {monthDeductions.length > 0 && (
-            <Box mt={2} pt={2} borderTop={1} borderColor="grey.200">
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Typography 
-                  fontWeight={600}
-                  sx={{ 
-                    fontSize: { xs: '0.875rem', sm: '1rem' },
-                    color: 'rgba(255, 255, 255, 0.9)'
-                  }}
-                >
-                  Total Deductions:
-                </Typography>
-                <Typography 
-                  fontWeight={700}
-                  sx={{ 
-                    fontSize: { xs: '0.875rem', sm: '1rem' },
-                    color: 'rgba(255, 255, 255, 0.9)'
-                  }}
-                >
-                  <RemoveCircleOutlineIcon fontSize="small" sx={{ mr: 0.5, color: 'rgba(255, 255, 255, 0.7)' }} />₱{totalDeductions.toFixed(2)}
-                </Typography>
-              </Box>
             </Box>
           )}
         </Box>
 
-
         {/* Additions Section */}
-        <Box 
-          p={3}
-          sx={{
-            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.08) 100%)',
-            borderRadius: 3,
-            border: '1px solid rgba(16, 185, 129, 0.3)',
-            minHeight: 120, // Consistent minimum height
-          }}
-        >
-          <Box 
-            display="flex" 
-            flexDirection={{ xs: 'row', sm: 'row' }}
-            alignItems={{ xs: 'center', sm: 'center' }} 
-            justifyContent="space-between" 
-            gap={{ xs: 1, sm: 0 }}
-            mb={2}
-          >
+        <Box sx={{ m: 0, p: 0, mt: '48px', mb: 0, pt: 0, pb: 0, marginBottom: 0, paddingBottom: 0, marginTop: '48px', paddingTop: 0, display: 'flex', flexDirection: 'column', gap: 0, lineHeight: '24px', height: '24px' }}>
+          <Box display="flex" alignItems="center" justifyContent="space-between" mb={0} sx={{ height: '24px', lineHeight: '24px', m: 0, p: 0, width: '100%' }}>
             <Typography 
-              variant="subtitle1" 
-              fontWeight={600}
               sx={{ 
-                fontSize: { xs: '0.875rem', sm: '1rem' },
-                color: '#059669',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em'
+                fontSize: { xs: '0.875rem', sm: '0.9375rem' },
+                color: '#1e293b',
+                fontFamily: 'monospace',
+                lineHeight: '24px',
+                m: 0,
+                p: 0,
+                mt: 0,
+                mb: 0,
+                pt: 0,
+                pb: 0,
+                height: '24px',
               }}
             >
-              Additions
+              Additions:
             </Typography>
-            <Box sx={{ ml: 'auto', display: 'flex', justifyContent: { xs: 'flex-end', sm: 'flex-end' } }}>
-              <Button
-                variant="outlined"
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+              <IconButton
                 size="small"
-                color="success"
-                startIcon={<AddIcon />}
                 onClick={() => setShowAddBonus(true)}
                 sx={{ 
-                  fontWeight: 600,
-                  minWidth: { xs: 'auto', sm: 'auto' },
-                  px: { xs: 1.5, sm: 2 },
-                  borderRadius: 2,
-                  borderColor: 'rgba(16, 185, 129, 0.3)',
+                  p: 0.25,
+                  color: '#94a3b8',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                width: '24px',
+                height: '24px',
+                minWidth: '24px',
                   '&:hover': {
-                    borderColor: '#10b981',
-                    background: 'rgba(16, 185, 129, 0.05)',
+                    background: 'transparent',
+                    color: '#64748b',
                   }
                 }}
               >
-                Add
-              </Button>
+                <AddIcon sx={{ fontSize: '20px', width: '20px', height: '20px' }} />
+              </IconButton>
             </Box>
           </Box>
           {monthBonuses.length === 0 ? (
-            <Box 
-              textAlign="center" 
-              py={2}
-              sx={{
-                background: 'rgba(16, 185, 129, 0.03)',
-                borderRadius: 2,
-                border: '1px dashed rgba(16, 185, 129, 0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                minHeight: 60,
-              }}
-            >
+            <Box sx={{ m: 0, p: 0, mb: 0, pb: 0, mt: 0, pt: 0, height: '24px', lineHeight: '24px', display: 'flex', alignItems: 'flex-start' }}>
               <Typography 
-                color="text.secondary" 
-                fontSize={14}
-                sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+                component="div"
+                sx={{ 
+                  fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+                  color: '#94a3b8',
+                  fontFamily: 'monospace',
+                  fontStyle: 'italic',
+                  lineHeight: '24px',
+                  m: 0,
+                  p: 0,
+                  mt: 0,
+                  mb: 0,
+                  pt: 0,
+                  pb: 0,
+                  display: 'block',
+                  height: '24px',
+                }}
               >
-                No additions for this month
+                (none)
               </Typography>
             </Box>
           ) : (
-            <List dense disablePadding>
-              {monthBonuses.map((bonus, idx) => (
-                <React.Fragment key={bonus.id}>
-                  <ListItem sx={{ pl: 0, pr: 0 }} disableGutters>
-                    <Box
-                      display="flex"
-                      flexDirection="row"
-                      alignItems="flex-start"
-                      width="100%"
-                      gap={1}
+            <Box component="ol" sx={{ pl: 2, m: 0, listStyle: 'decimal' }}>
+              {monthBonuses.map((bonus) => (
+                <Box
+                  key={bonus.id}
+                  component="li"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  mb={0}
+                  sx={{ height: '24px', lineHeight: '24px' }}
+                >
+                  <Box display="flex" alignItems="center" gap={0} sx={{ lineHeight: '24px' }}>
+                    <Typography 
+                      sx={{ 
+                        fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+                        color: bonus.given ? '#94a3b8' : '#1e293b',
+                        fontFamily: 'monospace',
+                        textDecoration: bonus.given ? 'line-through' : 'none',
+                        lineHeight: '24px',
+                        m: 0,
+                        p: 0,
+                        mt: 0,
+                        mb: 0,
+                        pt: 0,
+                        pb: 0,
+                        height: '24px',
+                      }}
                     >
-                      {/* Amount+Icon and Date (always column) */}
-                      <Box
-                        display="flex"
-                        flexDirection="column"
-                        alignItems="flex-start"
-                        minWidth={90}
-                        sx={{ mr: { sm: 1 } }}
+                      {bonus.purpose} - ₱{bonus.amount.toFixed(2)} ({format(new Date(bonus.date), 'MMM dd')})
+                    </Typography>
+                    {bonus.given && (
+                      <Typography 
+                        sx={{ 
+                          fontSize: '0.75rem',
+                          color: '#10b981',
+                          fontFamily: 'monospace',
+                          m: 0,
+                          p: 0,
+                          mt: 0,
+                          mb: 0,
+                          pt: 0,
+                          pb: 0,
+                        }}
                       >
-                        <Box display="flex" alignItems="center" gap={1}>
-                          <AddCircleOutlineIcon 
-                            fontSize="small" 
-                            sx={{ 
-                              color: bonus.given ? 'rgba(255, 255, 255, 0.4)' : '#10b981' 
-                            }} 
-                          />
-                          <Typography
-                            fontWeight={600}
-                            sx={{ 
-                              fontSize: { xs: '0.875rem', sm: '1rem' },
-                              color: bonus.given ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.9)'
-                            }}
-                          >
-                            ₱{bonus.amount.toFixed(2)}
-                          </Typography>
-                        </Box>
-                        <Typography
-                          variant="body2"
-                          sx={{ 
-                            fontSize: { xs: '0.75rem', sm: '0.875rem' }, 
-                            mt: 0.5,
-                            color: bonus.given ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.6)'
-                          }}
-                        >
-                          {format(new Date(bonus.date), 'MMM dd, yyyy')}
-                        </Typography>
-                      </Box>
-                      {/* Reason chip and action buttons */}
-                      <Box flex={1} display="flex" alignItems="center" justifyContent="flex-start" gap={1}>
-                        <Chip
-                          label={bonus.purpose}
-                          size="small"
-                          sx={{ 
-                            fontSize: { xs: '0.75rem', sm: '0.875rem' }, 
-                            backgroundColor: bonus.given ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.1)',
-                            color: bonus.given ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.9)',
-                            border: bonus.given ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.2)',
-                            '& .MuiChip-label': {
-                              color: bonus.given ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.9)',
-                              fontWeight: 600
-                            }
-                          }}
-                        />
-                        <Box ml="auto" display="flex" alignItems="center" gap={0.5}>
-                          {/* Given toggle - Circle checkbox */}
-                          <IconButton
-                            size="small"
-                            onClick={() => handleToggleBonusGiven(bonus.id, !bonus.given)}
-                            sx={{ 
-                              p: 0.5,
-                              '&:hover': {
-                                backgroundColor: bonus.given ? 'rgba(16, 185, 129, 0.1)' : 'rgba(0, 0, 0, 0.04)',
-                              }
-                            }}
-                            aria-label={bonus.given ? 'Mark as not given' : 'Mark as given'}
-                          >
-                            {bonus.given ? (
-                              <CheckCircleIcon 
-                                sx={{ 
-                                  color: '#10b981', 
-                                  fontSize: 20,
-                                  '&:hover': {
-                                    color: '#059669',
-                                  }
-                                }} 
-                              />
-                            ) : (
-                              <RadioButtonUncheckedIcon 
-                                sx={{ 
-                                  color: 'rgba(255, 255, 255, 0.6)', 
-                                  fontSize: 20,
-                                  '&:hover': {
-                                    color: 'rgba(255, 255, 255, 0.8)',
-                                  }
-                                }} 
-                              />
-                            )}
-                          </IconButton>
-                          <IconButton
-                            edge="end"
-                            aria-label="delete bonus"
-                            sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
-                            onClick={async () => {
-                              if (window.confirm('Delete this addition?')) {
-                                const response = await fetch(`/api/bonuses?id=${bonus.id}`, { method: 'DELETE' })
-                                if (response.ok) {
-                                  // Update local bonuses state immediately
-                                  setMonthBonuses(prevBonuses => 
-                                    prevBonuses.filter(b => b.id !== bonus.id)
-                                  )
-                                }
-                                onUpdate()
-                              }
-                            }}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </Box>
-                      </Box>
-                    </Box>
-                  </ListItem>
-                  {idx < monthBonuses.length - 1 && <Divider component="li" sx={{ my: 0.5 }} />}
-                </React.Fragment>
+                        ✓
+                      </Typography>
+                    )}
+                  </Box>
+                  <Box display="flex" alignItems="center" gap={0} sx={{ justifyContent: 'flex-end', pr: '16px' }}>
+                    <IconButton
+                      size="small"
+                      onClick={() => handleToggleBonusGiven(bonus.id, !bonus.given)}
+                      sx={{ 
+                        p: 0.25,
+                        color: '#94a3b8',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                width: '24px',
+                height: '24px',
+                minWidth: '24px',
+                        '&:hover': {
+                          background: 'transparent',
+                          color: '#10b981',
+                        }
+                      }}
+                      aria-label={bonus.given ? 'Mark as not given' : 'Mark as given'}
+                    >
+                      <Typography sx={{ fontSize: '20px', fontFamily: 'monospace', lineHeight: '20px', height: '20px', width: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: 0 }}>
+                        {bonus.given ? '✓' : '○'}
+                      </Typography>
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      onClick={async () => {
+                        if (window.confirm('Delete this addition?')) {
+                          const response = await fetch(`/api/bonuses?id=${bonus.id}`, { method: 'DELETE' })
+                          if (response.ok) {
+                            setMonthBonuses(prevBonuses => 
+                              prevBonuses.filter(b => b.id !== bonus.id)
+                            )
+                          }
+                          onUpdate()
+                        }
+                      }}
+                      sx={{ 
+                        p: 0.25,
+                        color: '#94a3b8',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                width: '24px',
+                height: '24px',
+                minWidth: '24px',
+                        '&:hover': {
+                          background: 'transparent',
+                          color: '#dc2626',
+                        }
+                      }}
+                    >
+                      <Typography sx={{ fontSize: '20px', fontFamily: 'monospace', lineHeight: '20px', height: '20px', width: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: 0 }}>×</Typography>
+                    </IconButton>
+                  </Box>
+                </Box>
               ))}
-            </List>
-          )}
-          {monthBonuses.length > 0 && (
-            <Box mt={2} pt={2} borderTop={1} borderColor="grey.200">
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Typography 
-                  fontWeight={600}
-                  sx={{ 
-                    fontSize: { xs: '0.875rem', sm: '1rem' },
-                    color: 'rgba(255, 255, 255, 0.9)'
-                  }}
-                >
-                  Total Additions:
-                </Typography>
-                <Typography 
-                  fontWeight={700}
-                  sx={{ 
-                    fontSize: { xs: '0.875rem', sm: '1rem' },
-                    color: 'rgba(255, 255, 255, 0.9)'
-                  }}
-                >
-                  <AddCircleOutlineIcon fontSize="small" sx={{ mr: 0.5, color: 'rgba(255, 255, 255, 0.7)' }} />₱{totalBonuses.toFixed(2)}
-                </Typography>
-              </Box>
             </Box>
           )}
         </Box>
-          </Box> {/* Close Scrollable Content Area */}
-
+          </Box>{/* Close Scrollable Content Area */}
           {/* Bottom Section - Always Sticky */}
           <Box 
             sx={{
               display: 'flex',
               flexDirection: 'column',
-              gap: 3,
-              flexShrink: 0, // Don't shrink this section
+              gap: 0,
+              flexShrink: 0,
+              m: 0,
+              p: 0,
+              mt: 0,
+              mb: 0,
+              pt: 0,
+              pb: 0,
             }}
           >
-            {/* Divider */}
-            <Box sx={{ height: '32px', display: 'flex', alignItems: 'center' }}>
-              <Box 
-                sx={{ 
-                  width: '100%', 
-                  height: '1px', 
-                  background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%)' 
-                }} 
-              />
-            </Box>
         {/* Net Pay Section */}
-        <Box 
-          p={3}
-          sx={{
-            background: netPay >= 0 
-              ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.1) 100%)'
-              : 'linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.1) 100%)',
-            borderRadius: 3,
-            border: netPay >= 0 
-              ? '1px solid rgba(16, 185, 129, 0.4)'
-              : '1px solid rgba(239, 68, 68, 0.4)',
+        <Typography 
+          sx={{ 
+            fontSize: { xs: '0.875rem', sm: '0.9375rem' },
+            color: '#1e293b',
+            fontFamily: 'monospace',
+            lineHeight: '24px',
+            m: 0,
+            p: 0,
+            mt: '48px',
+            mb: 0,
+            pt: 0,
+            pb: 0,
+            height: '24px',
           }}
         >
-          <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-            <Typography 
-              variant="subtitle1" 
-              fontWeight={600}
-              sx={{ 
-                fontSize: { xs: '0.875rem', sm: '1rem' },
-                color: netPay >= 0 ? '#059669' : '#dc2626',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em'
-              }}
-            >
-              Net Pay:
-            </Typography>
-            <Typography 
-              variant="h4" 
-              fontWeight={700} 
-              color={netPay >= 0 ? 'success.main' : 'error.main'}
-              sx={{ 
-                fontSize: { xs: '1.75rem', sm: '2rem' },
-                background: netPay >= 0 
-                  ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-                  : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                textShadow: netPay >= 0 
-                  ? '0 2px 4px rgba(16, 185, 129, 0.1)'
-                  : '0 2px 4px rgba(239, 68, 68, 0.1)',
-              }}
-            >
-              ₱{netPay.toFixed(2)}
-            </Typography>
-          </Box>
+          Net Pay: ₱{netPay.toFixed(2)}
+        </Typography>
+        <Box display="flex" justifyContent="center" gap={0} flexWrap="wrap" sx={{ height: '24px', lineHeight: '24px', m: 0 }}>
           <Button
-            fullWidth
-            variant={isFullyPaid ? 'contained' : 'contained'}
-            color={isFullyPaid ? 'error' : 'success'}
+            variant="text"
+            size="small"
             onClick={isFullyPaid ? handleUnmarkPaid : handleMarkPaid}
             disabled={(!isFullyPaid && toPay <= 0) || isPaying}
             sx={{ 
-              fontWeight: 700, 
-              py: { xs: 1.5, sm: 1.2 }, 
-              mb: 2,
-              fontSize: { xs: '0.875rem', sm: '1rem' },
-              borderRadius: 2,
-              background: isFullyPaid 
-                ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
-                : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              py: 0,
+              px: 1,
+              fontSize: { xs: '0.75rem', sm: '0.8125rem' },
+              fontFamily: 'monospace',
+              textTransform: 'none',
+              minWidth: 'auto',
+              lineHeight: '24px',
+              height: '24px',
+              m: 0,
+              color: isFullyPaid ? '#dc2626' : '#10b981',
               '&:hover': {
-                background: isFullyPaid 
-                  ? 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)'
-                  : 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                background: 'transparent',
+                textDecoration: 'underline',
+              },
+              '&:disabled': {
+                color: '#94a3b8',
               }
             }}
           >
-            {isFullyPaid ? (isPaying ? 'Unmarking...' : 'Unmark as Paid') : (isPaying ? 'Marking...' : 'Mark as Paid')}
+            {isFullyPaid ? (isPaying ? 'Unmarking...' : '[Unmark as Paid]') : (isPaying ? 'Marking...' : '[Mark as Paid]')}
           </Button>
-        </Box>
-        {/* Mark/Unmark Invalid Button */}
-        <Box>
           {invalidMonth ? (
             <Button
-              variant="contained"
-              color="warning"
+              variant="text"
+              size="small"
               onClick={handleUnmarkInvalid}
               disabled={loadingInvalid}
               sx={{ 
-                fontWeight: 600,
-                fontSize: { xs: '0.875rem', sm: '1rem' },
-                borderRadius: 2,
-                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                py: 0,
+                px: 1,
+                fontSize: { xs: '0.75rem', sm: '0.8125rem' },
+                fontFamily: 'monospace',
+                textTransform: 'none',
+                minWidth: 'auto',
+                lineHeight: '24px',
+                height: '24px',
+                m: 0,
+                color: '#d97706',
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
+                  background: 'transparent',
+                  textDecoration: 'underline',
+                },
+                '&:disabled': {
+                  color: '#94a3b8',
                 }
               }}
-              fullWidth
             >
-              Unmark as Invalid
+              [Unmark as Invalid]
             </Button>
           ) : (
             <Button
-              variant="outlined"
-              color="warning"
+              variant="text"
+              size="small"
               onClick={() => setShowInvalidDialog(true)}
               disabled={loadingInvalid}
               sx={{ 
-                fontWeight: 600,
-                fontSize: { xs: '0.875rem', sm: '1rem' },
-                borderRadius: 2,
-                borderColor: '#f59e0b',
-                color: '#f59e0b',
-                background: 'rgba(245, 158, 11, 0.1)',
+                py: 0,
+                px: 1,
+                fontSize: { xs: '0.75rem', sm: '0.8125rem' },
+                fontFamily: 'monospace',
+                textTransform: 'none',
+                minWidth: 'auto',
+                lineHeight: '24px',
+                height: '24px',
+                m: 0,
+                color: '#d97706',
                 '&:hover': {
-                  borderColor: '#d97706',
-                  color: '#d97706',
-                  background: 'rgba(245, 158, 11, 0.2)',
-                  transform: 'translateY(-1px)',
+                  background: 'transparent',
+                  textDecoration: 'underline',
                 },
                 '&:disabled': {
-                  borderColor: 'rgba(245, 158, 11, 0.3)',
-                  color: 'rgba(245, 158, 11, 0.3)',
-                  background: 'rgba(245, 158, 11, 0.05)',
+                  color: '#94a3b8',
                 }
               }}
-              fullWidth
             >
-              Mark as Invalid
+              [Mark as Invalid]
             </Button>
           )}
         </Box>
@@ -1244,50 +1139,23 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
           </form>
         </Dialog>
         {/* To Pay Section */}
-        <Box 
-          p={3}
-          sx={{
-            background: toPay >= 0 
-              ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(99, 102, 241, 0.1) 100%)'
-              : 'linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.1) 100%)',
-            borderRadius: 3,
-            border: toPay >= 0 
-              ? '1px solid rgba(99, 102, 241, 0.4)'
-              : '1px solid rgba(239, 68, 68, 0.4)',
+        <Typography 
+          sx={{ 
+            fontSize: { xs: '0.875rem', sm: '0.9375rem' },
+            color: '#1e293b',
+            fontFamily: 'monospace',
+            lineHeight: '24px',
+            m: 0,
+            p: 0,
+            mt: 0,
+            mb: 0,
+            pt: 0,
+            pb: 0,
+            height: '24px',
           }}
         >
-          <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Typography 
-              fontWeight={700} 
-              sx={{ 
-                fontSize: { xs: '1rem', sm: '1.1rem' },
-                color: toPay >= 0 ? '#6366f1' : '#dc2626',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em'
-              }}
-            >
-              To Pay:
-            </Typography>
-            <Typography 
-              fontWeight={700} 
-              color={toPay >= 0 ? 'primary.main' : 'error.main'} 
-              sx={{ 
-                fontSize: { xs: '1.5rem', sm: '1.75rem' },
-                background: toPay >= 0 
-                  ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)'
-                  : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                textShadow: toPay >= 0 
-                  ? '0 2px 4px rgba(99, 102, 241, 0.1)'
-                  : '0 2px 4px rgba(239, 68, 68, 0.1)',
-              }}
-            >
-              ₱{toPay.toFixed(2)}
-            </Typography>
-          </Box>
-        </Box>
+          To Pay: ₱{toPay.toFixed(2)}
+        </Typography>
           </Box> {/* Close Bottom Section */}
         </Box> {/* Close Main Content Flexbox */}
       </CardContent>

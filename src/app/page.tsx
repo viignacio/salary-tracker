@@ -198,31 +198,31 @@ export default function Home() {
   }
 
   return (
-    <Box 
-      height="100vh" 
-      sx={{
-        background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 50%, rgba(236, 72, 153, 0.1) 100%)',
-        position: 'relative',
-        overflow: 'auto',
-      }}
-    >
+      <Box 
+        height="100vh" 
+        sx={{
+          background: '#f8fafc',
+          position: 'relative',
+          overflow: 'auto',
+        }}
+      >
       <Container maxWidth={false} sx={{ 
-        width: '80%', 
-        py: { xs: 3, sm: 6 }, 
-        px: { xs: 2, sm: 3 }, 
+        width: '95%', 
+        maxWidth: '1400px',
+        py: { xs: 2, sm: 3 }, 
+        px: { xs: 1.5, sm: 2 }, 
         position: 'relative', 
         zIndex: 1 
       }}>
         {/* Header */}
         <Box 
-          mb={{ xs: 4, sm: 6 }}
+          mb={{ xs: 2, sm: 3 }}
           sx={{
-            background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%)',
-            backdropFilter: 'blur(20px)',
-            borderRadius: 4,
-            p: { xs: 3, sm: 4 },
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            background: '#ffffff',
+            borderRadius: 1,
+            p: { xs: 2, sm: 2.5 },
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+            border: '1px solid rgba(0, 0, 0, 0.08)',
           }}
         >
           <Box 
@@ -230,30 +230,26 @@ export default function Home() {
             flexDirection={{ xs: 'column', sm: 'row' }}
             justifyContent="space-between" 
             alignItems={{ xs: 'flex-start', sm: 'center' }} 
-            gap={{ xs: 2, sm: 0 }}
-            mb={2}
+            gap={{ xs: 1.5, sm: 0 }}
           >
             <Box>
               <Typography 
-                variant="h3" 
-                fontWeight={700} 
+                variant="h4" 
+                fontWeight={600} 
                 sx={{ 
-                  fontSize: { xs: '1.75rem', sm: '2.25rem' },
-                  lineHeight: { xs: 1.2, sm: 1.3 },
-                  background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-                  backgroundClip: 'text',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  mb: 1
+                  fontSize: { xs: '1.25rem', sm: '1.5rem' },
+                  lineHeight: 1.3,
+                  color: '#1e293b',
+                  mb: 0.5
                 }}
               >
                 Claver GC Salary Tracker
               </Typography>
               <Typography 
                 sx={{ 
-                  fontSize: { xs: '0.875rem', sm: '1rem' },
-                  fontWeight: 500,
-                  color: 'rgba(255, 255, 255, 0.8)'
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                  fontWeight: 400,
+                  color: '#64748b'
                 }}
               >
                 Manage monthly salaries and deductions for your household helpers
@@ -261,19 +257,21 @@ export default function Home() {
             </Box>
             <Button
               variant="outlined"
+              size="small"
               startIcon={<LogoutIcon />}
               onClick={handleLogout}
               sx={{ 
-                minWidth: { xs: 'auto', sm: 120 },
-                px: { xs: 2, sm: 3 },
-                py: { xs: 1.5, sm: 1.5 },
-                borderRadius: 2,
+                minWidth: { xs: 'auto', sm: 100 },
+                px: { xs: 1.5, sm: 2 },
+                py: { xs: 1, sm: 1 },
+                borderRadius: 1,
                 borderColor: 'rgba(239, 68, 68, 0.3)',
-                color: '#ef4444',
+                color: '#dc2626',
                 fontWeight: 600,
+                fontSize: '0.8125rem',
                 '&:hover': {
-                  borderColor: '#ef4444',
-                  background: 'rgba(239, 68, 68, 0.05)',
+                  borderColor: '#dc2626',
+                  background: 'rgba(239, 68, 68, 0.06)',
                 }
               }}
             >
@@ -286,17 +284,16 @@ export default function Home() {
         <Box 
           display="flex" 
           flexDirection={{ xs: 'column', sm: 'row' }} 
-          gap={{ xs: 2, sm: 3 }} 
-          mb={{ xs: 4, sm: 6 }}
+          gap={{ xs: 1.5, sm: 2 }} 
+          mb={{ xs: 2, sm: 3 }}
           alignItems={{ xs: 'stretch', sm: 'center' }}
           justifyContent={{ xs: 'stretch', sm: 'space-between' }}
           sx={{
-            background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.7) 100%)',
-            backdropFilter: 'blur(10px)',
-            borderRadius: 3,
-            p: 3,
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            background: '#ffffff',
+            borderRadius: 1,
+            p: { xs: 1.5, sm: 2 },
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+            border: '1px solid rgba(0, 0, 0, 0.08)',
           }}
         >
           <Box sx={{ display: { xs: 'none', sm: 'block' }, flex: 1 }} />
@@ -309,17 +306,19 @@ export default function Home() {
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', flex: 1 }}>
             <Button
             variant="contained"
+            size="small"
             startIcon={<AddIcon />}
             onClick={() => setShowAddHelper(true)}
             sx={{ 
-              minWidth: { xs: 'auto', sm: 160 }, 
+              minWidth: { xs: 'auto', sm: 120 }, 
               fontWeight: 600,
-              py: { xs: 1.5, sm: 1.5 },
-              borderRadius: 2,
-              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+              py: { xs: 1, sm: 1 },
+              px: { xs: 1.5, sm: 2 },
+              borderRadius: 1,
+              background: '#6366f1',
+              fontSize: '0.8125rem',
               '&:hover': {
-                background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
-                transform: 'translateY(-1px)',
+                background: '#4f46e5',
               }
             }}
           >
@@ -332,60 +331,60 @@ export default function Home() {
         {helpers.length === 0 ? (
           <Box 
             textAlign="center" 
-            py={{ xs: 8, sm: 10 }}
+            py={{ xs: 6, sm: 8 }}
             sx={{
-              background: 'rgba(255, 255, 255, 0.7)',
-              backdropFilter: 'blur(10px)',
-              borderRadius: 4,
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+              background: '#ffffff',
+              borderRadius: 1,
+              border: '1px solid rgba(0, 0, 0, 0.08)',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
             }}
           >
             <Box
               sx={{
-                width: 80,
-                height: 80,
+                width: 60,
+                height: 60,
                 borderRadius: '50%',
-                background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                background: '#6366f1',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 mx: 'auto',
-                mb: 3,
-                boxShadow: '0 8px 24px rgba(99, 102, 241, 0.3)',
+                mb: 2,
               }}
             >
-              <MonetizationOnOutlinedIcon sx={{ fontSize: 40, color: 'white' }} />
+              <MonetizationOnOutlinedIcon sx={{ fontSize: 30, color: 'white' }} />
             </Box>
             <Typography 
-              variant="h5" 
+              variant="h6" 
               fontWeight={600} 
               color="text.primary" 
-              mb={2}
-              sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
+              mb={1}
+              sx={{ fontSize: { xs: '1rem', sm: '1.125rem' } }}
             >
               No helpers added yet
             </Typography>
             <Typography 
               color="text.secondary" 
-              mb={4}
-              sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+              mb={3}
+              sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
             >
               Get started by adding your first household helper
             </Typography>
             <Button
               variant="contained"
+              size="small"
               startIcon={<AddIcon />}
               onClick={() => setShowAddHelper(true)}
               sx={{ 
-                minWidth: { xs: 'auto', sm: 160 }, 
+                minWidth: { xs: 'auto', sm: 120 }, 
                 fontWeight: 600,
-                py: { xs: 1.5, sm: 1.5 },
-                borderRadius: 2,
-                background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                py: { xs: 1, sm: 1 },
+                px: { xs: 1.5, sm: 2 },
+                borderRadius: 1,
+                background: '#6366f1',
+                fontSize: '0.8125rem',
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
-                  transform: 'translateY(-2px)',
+                  background: '#4f46e5',
                 }
               }}
             >
@@ -395,7 +394,7 @@ export default function Home() {
         ) : (
           <Grid 
             container 
-            spacing={{ xs: 2, sm: 3 }} 
+            spacing={{ xs: 1.5, sm: 2 }} 
             justifyContent="center" 
             sx={{ 
               width: '100%', 
@@ -407,12 +406,11 @@ export default function Home() {
                 key={helper.id} 
                 item 
                 xs={12} 
-                sm={6} 
+                sm={6}
+                md={4}
                 sx={{ 
                   display: 'flex', 
                   justifyContent: 'center',
-                  minWidth: { xs: '100%', sm: 'calc(50% - 12px)' },
-                  maxWidth: { xs: '100%', sm: 'calc(50% - 12px)' }
                 }}
               >
                 <HelperCard

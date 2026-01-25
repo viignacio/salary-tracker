@@ -577,6 +577,7 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
               pb: 0,
               marginBottom: 0,
               paddingBottom: 0,
+              overflow: 'visible',
             }}
           >
         {/* Salary Section */}
@@ -691,7 +692,7 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
         </Box>
 
         {/* Deductions Section */}
-        <Box mb={0} pb={0} mt={0} pt={0} sx={{ height: '24px', lineHeight: '24px', paddingBottom: 0, marginBottom: 0, paddingTop: 0, marginTop: '24px' }}>
+        <Box mb={0} pb={0} mt={0} pt={0} sx={{ display: 'block', lineHeight: '24px', paddingBottom: 0, marginBottom: 0, paddingTop: 0, marginTop: '24px' }}>
           <Box display="flex" alignItems="center" justifyContent="space-between" mb={0} sx={{ height: '24px', lineHeight: '24px', width: '100%' }}>
             <Typography 
               sx={{ 
@@ -753,7 +754,7 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
               (none)
             </Typography>
           ) : (
-            <Box component="ol" sx={{ pl: 2, m: 0, listStyle: 'decimal' }}>
+            <Box component="ol" sx={{ pl: 0, m: 0, listStyle: 'decimal', display: 'block' }}>
               {monthDeductions.map((deduction) => (
                 <Box
                   key={deduction.id}
@@ -820,7 +821,7 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
         </Box>
 
         {/* Additions Section */}
-        <Box sx={{ m: 0, p: 0, mt: '48px', mb: 0, pt: 0, pb: 0, marginBottom: 0, paddingBottom: 0, marginTop: '48px', paddingTop: 0, display: 'flex', flexDirection: 'column', gap: 0, lineHeight: '24px', height: '24px' }}>
+        <Box sx={{ m: 0, p: 0, mt: '24px', mb: 0, pt: 0, pb: 0, marginBottom: 0, paddingBottom: 0, marginTop: '24px', paddingTop: 0, display: 'flex', flexDirection: 'column', gap: 0, lineHeight: '24px' }}>
           <Box display="flex" alignItems="center" justifyContent="space-between" mb={0} sx={{ height: '24px', lineHeight: '24px', m: 0, p: 0, width: '100%' }}>
             <Typography 
               sx={{ 
@@ -886,7 +887,7 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
               </Typography>
             </Box>
           ) : (
-            <Box component="ol" sx={{ pl: 2, m: 0, listStyle: 'decimal' }}>
+            <Box component="ol" sx={{ pl: 0, m: 0, listStyle: 'decimal', display: 'block' }}>
               {monthBonuses.map((bonus) => (
                 <Box
                   key={bonus.id}
@@ -1019,7 +1020,7 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
             lineHeight: '24px',
             m: 0,
             p: 0,
-            mt: '48px',
+            mt: '24px',
             mb: 0,
             pt: 0,
             pb: 0,
@@ -1028,7 +1029,19 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
         >
           Net Pay: ₱{netPay.toFixed(2)}
         </Typography>
-        <Box display="flex" justifyContent="center" gap={0} flexWrap="wrap" sx={{ height: '24px', lineHeight: '24px', m: 0 }}>
+        <Box 
+          display="flex" 
+          justifyContent="center" 
+          gap={0} 
+          flexWrap="wrap" 
+          sx={{ 
+            flexDirection: { xs: 'column', sm: 'row' },
+            height: { xs: 'auto', sm: '24px' },
+            lineHeight: '24px', 
+            m: 0, 
+            mt: '24px' 
+          }}
+        >
           <Button
             variant="text"
             size="small"
@@ -1116,11 +1129,11 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
         </Box>
         {/* Reason Dialog */}
         <Dialog open={showInvalidDialog} onClose={() => setShowInvalidDialog(false)}>
-          <DialogTitle>Mark Month as Invalid</DialogTitle>
+          <DialogTitle sx={{ fontFamily: 'monospace' }}>Mark Month as Invalid</DialogTitle>
           <form onSubmit={e => { e.preventDefault(); handleMarkInvalid(); }}>
             <DialogContent sx={{ px: { xs: 3, sm: 4 }, pt: 3, pb: 2 }}>
               <Stack spacing={2}>
-                <Typography sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+                <Typography sx={{ fontSize: { xs: '0.875rem', sm: '1rem' }, fontFamily: 'monospace' }}>
                   Optionally specify a reason for marking this month as invalid (e.g., not started, on leave):
                 </Typography>
                 <TextField
@@ -1129,12 +1142,62 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
                   onChange={e => setInvalidReason(e.target.value)}
                   fullWidth
                   autoFocus
+                  sx={{
+                    fontFamily: 'monospace',
+                    '& .MuiOutlinedInput-root': {
+                      fontFamily: 'monospace',
+                    },
+                    '& .MuiInputLabel-root': {
+                      fontFamily: 'monospace',
+                    }
+                  }}
                 />
               </Stack>
             </DialogContent>
             <DialogActions sx={{ px: { xs: 3, sm: 4 }, pb: 3, pt: 2 }}>
-              <Button onClick={() => setShowInvalidDialog(false)} color="inherit">Cancel</Button>
-              <Button type="submit" variant="contained" color="warning" disabled={loadingInvalid}>Mark as Invalid</Button>
+              <Button 
+                onClick={() => setShowInvalidDialog(false)} 
+                variant="text"
+                size="small"
+                sx={{ 
+                  px: { xs: 1.5, sm: 2 },
+                  py: { xs: 1, sm: 1 },
+                  fontSize: '0.8125rem',
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  fontFamily: 'monospace',
+                  '&:hover': {
+                    background: 'transparent',
+                    textDecoration: 'underline',
+                  }
+                }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit" 
+                variant="text"
+                size="small"
+                disabled={loadingInvalid}
+                sx={{ 
+                  px: { xs: 1.5, sm: 2 },
+                  py: { xs: 1, sm: 1 },
+                  fontSize: '0.8125rem',
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  fontFamily: 'monospace',
+                  color: '#f59e0b',
+                  '&:hover': {
+                    background: 'transparent',
+                    textDecoration: 'underline',
+                  },
+                  '&:disabled': {
+                    color: 'rgba(0, 0, 0, 0.26)',
+                  }
+                }}
+              >
+                Mark as Invalid
+              </Button>
             </DialogActions>
           </form>
         </Dialog>

@@ -102,14 +102,15 @@ export default function LoginPage() {
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                mb: 1
+                mb: 1,
+                fontFamily: 'monospace',
               }}
             >
               Access Required
             </Typography>
             <Typography 
               color="text.secondary"
-              sx={{ fontSize: '1rem', fontWeight: 500 }}
+              sx={{ fontSize: '1rem', fontWeight: 500, fontFamily: 'monospace' }}
             >
               Please enter the password to access the Salary Tracker
             </Typography>
@@ -124,6 +125,10 @@ export default function LoginPage() {
                   borderRadius: 2,
                   background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%)',
                   border: '1px solid rgba(239, 68, 68, 0.2)',
+                  fontFamily: 'monospace',
+                  '& .MuiAlert-message': {
+                    fontFamily: 'monospace',
+                  }
                 }}
               >
                 {error}
@@ -140,8 +145,13 @@ export default function LoginPage() {
               variant="outlined"
               sx={{ 
                 mb: 4,
+                fontFamily: 'monospace',
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2,
+                  fontFamily: 'monospace',
+                },
+                '& .MuiInputLabel-root': {
+                  fontFamily: 'monospace',
                 }
               }}
               InputProps={{
@@ -167,22 +177,23 @@ export default function LoginPage() {
             />
             <Button 
               type="submit" 
-              variant="contained" 
+              variant="text" 
               fullWidth 
-              size="large" 
+              size="small" 
               disabled={loading}
               sx={{
-                py: 1.5,
-                borderRadius: 2,
-                background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                px: { xs: 1.5, sm: 2 },
+                py: { xs: 1, sm: 1 },
+                fontSize: '0.8125rem',
                 fontWeight: 600,
-                fontSize: '1rem',
+                textTransform: 'none',
+                fontFamily: 'monospace',
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
-                  transform: 'translateY(-1px)',
+                  background: 'transparent',
+                  textDecoration: 'underline',
                 },
                 '&:disabled': {
-                  background: 'rgba(99, 102, 241, 0.3)',
+                  color: 'rgba(0, 0, 0, 0.26)',
                 }
               }}
             >

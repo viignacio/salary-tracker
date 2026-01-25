@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { format } from 'date-fns'
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, IconButton, Stack, FormControlLabel, Checkbox } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
@@ -16,6 +16,12 @@ export default function AddBonusModal({ isOpen, onClose, onAdd }: AddBonusModalP
   const [amount, setAmount] = useState('')
   const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'))
   const [given, setGiven] = useState(false)
+
+  useEffect(() => {
+    if (isOpen) {
+      setDate(format(new Date(), 'yyyy-MM-dd'))
+    }
+  }, [isOpen])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -58,6 +64,7 @@ export default function AddBonusModal({ isOpen, onClose, onAdd }: AddBonusModalP
           fontSize: '1rem',
           fontWeight: 600,
           color: '#059669',
+          fontFamily: 'monospace',
         }}
       >
         Add Addition
@@ -92,8 +99,13 @@ export default function AddBonusModal({ isOpen, onClose, onAdd }: AddBonusModalP
               margin="dense"
               size="small"
               sx={{
+                fontFamily: 'monospace',
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2,
+                  fontFamily: 'monospace',
+                },
+                '& .MuiInputLabel-root': {
+                  fontFamily: 'monospace',
                 }
               }}
             />
@@ -110,8 +122,13 @@ export default function AddBonusModal({ isOpen, onClose, onAdd }: AddBonusModalP
               inputProps={{ min: 0.01, step: 0.01 }}
               size="small"
               sx={{
+                fontFamily: 'monospace',
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2,
+                  fontFamily: 'monospace',
+                },
+                '& .MuiInputLabel-root': {
+                  fontFamily: 'monospace',
                 }
               }}
             />
@@ -126,8 +143,13 @@ export default function AddBonusModal({ isOpen, onClose, onAdd }: AddBonusModalP
               InputLabelProps={{ shrink: true }}
               size="small"
               sx={{
+                fontFamily: 'monospace',
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2,
+                  fontFamily: 'monospace',
+                },
+                '& .MuiInputLabel-root': {
+                  fontFamily: 'monospace',
                 }
               }}
             />
@@ -147,8 +169,10 @@ export default function AddBonusModal({ isOpen, onClose, onAdd }: AddBonusModalP
               label="Already Given"
               sx={{ 
                 mt: 1,
+                fontFamily: 'monospace',
                 '& .MuiFormControlLabel-label': {
                   fontWeight: 500,
+                  fontFamily: 'monospace',
                 }
               }}
             />
@@ -165,15 +189,16 @@ export default function AddBonusModal({ isOpen, onClose, onAdd }: AddBonusModalP
         >
           <Button 
             onClick={onClose} 
-            color="inherit" 
             variant="text"
             size="small"
             sx={{ 
               flex: { xs: 1, sm: 'auto' },
-              py: { xs: 1, sm: 0.75 },
               px: { xs: 1.5, sm: 2 },
+              py: { xs: 1, sm: 1 },
               fontSize: '0.8125rem',
+              fontWeight: 600,
               textTransform: 'none',
+              fontFamily: 'monospace',
               '&:hover': {
                 background: 'transparent',
                 textDecoration: 'underline',
@@ -188,10 +213,12 @@ export default function AddBonusModal({ isOpen, onClose, onAdd }: AddBonusModalP
             size="small"
             sx={{ 
               flex: { xs: 1, sm: 'auto' },
-              py: { xs: 1, sm: 0.75 },
               px: { xs: 1.5, sm: 2 },
+              py: { xs: 1, sm: 1 },
               fontSize: '0.8125rem',
+              fontWeight: 600,
               textTransform: 'none',
+              fontFamily: 'monospace',
               color: '#10b981',
               '&:hover': {
                 background: 'transparent',

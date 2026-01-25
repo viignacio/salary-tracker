@@ -49,6 +49,7 @@ export default function AddHelperModal({ isOpen, onClose, onAdd }: AddHelperModa
           fontSize: '1rem',
           fontWeight: 600,
           color: '#1e293b',
+          fontFamily: 'monospace',
         }}
       >
         Add Helper
@@ -83,8 +84,13 @@ export default function AddHelperModal({ isOpen, onClose, onAdd }: AddHelperModa
             margin="dense"
             size="small"
             sx={{
+              fontFamily: 'monospace',
               '& .MuiOutlinedInput-root': {
                 borderRadius: 2,
+                fontFamily: 'monospace',
+              },
+              '& .MuiInputLabel-root': {
+                fontFamily: 'monospace',
               }
             }}
           />
@@ -100,15 +106,16 @@ export default function AddHelperModal({ isOpen, onClose, onAdd }: AddHelperModa
         >
           <Button 
             onClick={onClose} 
-            color="inherit" 
             variant="text"
             size="small"
             sx={{ 
               flex: { xs: 1, sm: 'auto' },
-              py: { xs: 1, sm: 0.75 },
               px: { xs: 1.5, sm: 2 },
+              py: { xs: 1, sm: 1 },
               fontSize: '0.8125rem',
+              fontWeight: 600,
               textTransform: 'none',
+              fontFamily: 'monospace',
               '&:hover': {
                 background: 'transparent',
                 textDecoration: 'underline',
@@ -123,10 +130,12 @@ export default function AddHelperModal({ isOpen, onClose, onAdd }: AddHelperModa
             size="small"
             sx={{ 
               flex: { xs: 1, sm: 'auto' },
-              py: { xs: 1, sm: 0.75 },
               px: { xs: 1.5, sm: 2 },
+              py: { xs: 1, sm: 1 },
               fontSize: '0.8125rem',
+              fontWeight: 600,
               textTransform: 'none',
+              fontFamily: 'monospace',
               color: '#6366f1',
               '&:hover': {
                 background: 'transparent',

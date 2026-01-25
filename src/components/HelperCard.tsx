@@ -754,7 +754,7 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
               (none)
             </Typography>
           ) : (
-            <Box component="ol" sx={{ pl: 0, m: 0, listStyle: 'decimal', display: 'block' }}>
+            <Box component="ol" sx={{ pl: '8px', m: 0, listStyle: 'decimal', display: 'block' }}>
               {monthDeductions.map((deduction) => (
                 <Box
                   key={deduction.id}
@@ -887,7 +887,7 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
               </Typography>
             </Box>
           ) : (
-            <Box component="ol" sx={{ pl: 0, m: 0, listStyle: 'decimal', display: 'block' }}>
+            <Box component="ol" sx={{ pl: '8px', m: 0, listStyle: 'decimal', display: 'block' }}>
               {monthBonuses.map((bonus) => (
                 <Box
                   key={bonus.id}

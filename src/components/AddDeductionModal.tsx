@@ -8,13 +8,14 @@ import CloseIcon from '@mui/icons-material/Close'
 interface AddDeductionModalProps {
   isOpen: boolean
   onClose: () => void
-  onAdd: (purpose: string, amount: number, date: string) => void
+  onAdd: (purpose: string, amount: number, date: string, remarks?: string) => void
 }
 
 export default function AddDeductionModal({ isOpen, onClose, onAdd }: AddDeductionModalProps) {
   const [purpose, setPurpose] = useState('')
   const [amount, setAmount] = useState('')
   const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'))
+  const [remarks, setRemarks] = useState('')
 
   useEffect(() => {
     if (isOpen) {
@@ -27,10 +28,11 @@ export default function AddDeductionModal({ isOpen, onClose, onAdd }: AddDeducti
     if (!purpose.trim() || !amount || !date) return
     const numAmount = parseFloat(amount)
     if (isNaN(numAmount) || numAmount <= 0) return
-    onAdd(purpose.trim(), numAmount, date)
+    onAdd(purpose.trim(), numAmount, date, remarks?.trim() || undefined)
     setPurpose('')
     setAmount('')
     setDate('')
+    setRemarks('')
   }
 
   return (
@@ -118,6 +120,28 @@ export default function AddDeductionModal({ isOpen, onClose, onAdd }: AddDeducti
               required
               margin="dense"
               inputProps={{ min: 0.01, step: 0.01 }}
+              size="small"
+              sx={{
+                fontFamily: 'monospace',
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  fontFamily: 'monospace',
+                },
+                '& .MuiInputLabel-root': {
+                  fontFamily: 'monospace',
+                }
+              }}
+            />
+            <TextField
+              label="Remarks"
+              value={remarks}
+              onChange={(e) => setRemarks(e.target.value)}
+              placeholder="Optional notes or details"
+              fullWidth
+              multiline
+              minRows={2}
+              maxRows={6}
+              margin="dense"
               size="small"
               sx={{
                 fontFamily: 'monospace',

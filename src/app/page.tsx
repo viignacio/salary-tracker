@@ -36,6 +36,7 @@ interface Helper {
     date: string
     month: string
     year: number
+    given?: boolean
   }>
 }
 
@@ -63,10 +64,10 @@ export default function Home() {
       const deductions = helper.deductions.filter(d => d.month === month && d.year === parseInt(year))
       const bonuses = helper.bonuses.filter(b => b.month === month && b.year === parseInt(year))
       
-      // Calculate totals
+      // Calculate totals (net pay only includes bonuses not yet given)
       const totalDeductions = deductions.reduce((sum, d) => sum + d.amount, 0)
-      const totalBonuses = bonuses.reduce((sum, b) => sum + b.amount, 0)
-      const netPay = salaryAmount + totalBonuses - totalDeductions
+      const totalBonusesNotGiven = bonuses.filter(b => !b.given).reduce((sum, b) => sum + b.amount, 0)
+      const netPay = salaryAmount + totalBonusesNotGiven - totalDeductions
       
       // Check if there's a "Fully paid" deduction that covers the net pay
       const fullyPaidDeduction = deductions.find(d => d.purpose === 'Fully paid')
@@ -75,7 +76,7 @@ export default function Home() {
       console.log(`Helper ${helper.name}:`, {
         salaryAmount,
         totalDeductions,
-        totalBonuses,
+        totalBonusesNotGiven,
         netPay,
         fullyPaidDeduction: fullyPaidDeduction?.amount,
         isFullyPaid

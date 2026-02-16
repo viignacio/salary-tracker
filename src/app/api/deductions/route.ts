@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { helperId, purpose, amount, date, month, year } = await request.json()
+    const { helperId, purpose, amount, date, month, year, remarks } = await request.json()
     
     if (!helperId || !purpose || !amount || !date || !month || !year) {
       return NextResponse.json(
@@ -55,6 +55,7 @@ export async function POST(request: NextRequest) {
         date: new Date(date),
         month,
         year: parseInt(year),
+        remarks: remarks != null && String(remarks).trim() !== '' ? String(remarks).trim() : null,
       },
       include: { helper: true },
     })

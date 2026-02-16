@@ -52,6 +52,7 @@ model Deduction {
   month       String   // Format: "YYYY-MM" (e.g., "2024-01")
   year        Int
   helperId    String
+  remarks     String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -69,6 +70,7 @@ model Bonus {
   month       String   // Format: "YYYY-MM" (e.g., "2024-01")
   year        Int
   helperId    String
+  remarks     String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   given       Boolean  @default(false)

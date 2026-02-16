@@ -59,11 +59,14 @@ export async function GET(request: NextRequest) {
       orderBy: { date: 'asc' },
     })
 
-    // Calculate net pay
+    // Calculate net pay (only bonuses not yet given count; given bonuses were already handed in advance)
     const salaryAmount = salary?.amount || 0
     const totalDeductions = deductions.reduce((sum: number, d: { amount: number }) => sum + d.amount, 0)
     const totalBonuses = bonuses.reduce((sum: number, b: { amount: number }) => sum + b.amount, 0)
-    const netPay = salaryAmount + totalBonuses - totalDeductions
+    const totalBonusesNotGiven = bonuses
+      .filter((b: { given?: boolean }) => !b.given)
+      .reduce((sum: number, b: { amount: number }) => sum + b.amount, 0)
+    const netPay = salaryAmount + totalBonusesNotGiven - totalDeductions
 
     // Generate CSV content
     const csvContent = [

@@ -8,7 +8,7 @@ import CloseIcon from '@mui/icons-material/Close'
 interface AddBonusModalProps {
   isOpen: boolean
   onClose: () => void
-  onAdd: (purpose: string, amount: number, date: string, given: boolean) => void
+  onAdd: (purpose: string, amount: number, date: string, given: boolean, remarks?: string) => void
 }
 
 export default function AddBonusModal({ isOpen, onClose, onAdd }: AddBonusModalProps) {
@@ -16,6 +16,7 @@ export default function AddBonusModal({ isOpen, onClose, onAdd }: AddBonusModalP
   const [amount, setAmount] = useState('')
   const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'))
   const [given, setGiven] = useState(false)
+  const [remarks, setRemarks] = useState('')
 
   useEffect(() => {
     if (isOpen) {
@@ -28,11 +29,12 @@ export default function AddBonusModal({ isOpen, onClose, onAdd }: AddBonusModalP
     if (!purpose.trim() || !amount || !date) return
     const numAmount = parseFloat(amount)
     if (isNaN(numAmount) || numAmount <= 0) return
-    onAdd(purpose.trim(), numAmount, date, given)
+    onAdd(purpose.trim(), numAmount, date, given, remarks?.trim() || undefined)
     setPurpose('')
     setAmount('')
     setDate('')
     setGiven(false)
+    setRemarks('')
   }
 
   return (
@@ -120,6 +122,28 @@ export default function AddBonusModal({ isOpen, onClose, onAdd }: AddBonusModalP
               required
               margin="dense"
               inputProps={{ min: 0.01, step: 0.01 }}
+              size="small"
+              sx={{
+                fontFamily: 'monospace',
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  fontFamily: 'monospace',
+                },
+                '& .MuiInputLabel-root': {
+                  fontFamily: 'monospace',
+                }
+              }}
+            />
+            <TextField
+              label="Remarks"
+              value={remarks}
+              onChange={(e) => setRemarks(e.target.value)}
+              placeholder="Optional notes or details"
+              fullWidth
+              multiline
+              minRows={2}
+              maxRows={6}
+              margin="dense"
               size="small"
               sx={{
                 fontFamily: 'monospace',

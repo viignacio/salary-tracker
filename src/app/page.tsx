@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { format, addMonths } from 'date-fns'
+import { parseYearMonth } from '@/lib/date'
 import HelperCard from '@/components/HelperCard'
 import AddHelperModal from '@/components/AddHelperModal'
 import MonthSelector from '@/components/MonthSelector'
@@ -89,7 +90,7 @@ export default function Home() {
     
     // If all helpers are fully paid AND there are helpers, move to next month
     if (allHelpersFullyPaid && helpersToCheck.length > 0) {
-      const currentDate = new Date(selectedMonth + '-01')
+      const currentDate = parseYearMonth(selectedMonth)
       const nextMonth = addMonths(currentDate, 1)
       const nextMonthString = format(nextMonth, 'yyyy-MM')
       console.log('Redirecting from', selectedMonth, 'to', nextMonthString)

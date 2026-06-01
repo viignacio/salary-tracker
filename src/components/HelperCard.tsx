@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { format } from 'date-fns'
+import { parseYearMonth } from '@/lib/date'
 import AddDeductionModal from './AddDeductionModal'
 import AddBonusModal from './AddBonusModal'
 import { Card, CardContent, Typography, Button, IconButton, TextField, Box, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Stack, Tooltip, Collapse } from '@mui/material'
@@ -435,7 +436,7 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
         useCORS: true,
       })
       const dataUrl = canvas.toDataURL('image/jpeg', 0.92)
-      const receiptDate = new Date(selectedMonth + '-01')
+      const receiptDate = parseYearMonth(selectedMonth)
       const monthName = format(receiptDate, 'MMMM')
       const sanitizedName = helper.name.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '_') || 'Helper'
       const filename = `${monthName}_${sanitizedName}.jpg`
@@ -1458,7 +1459,7 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', borderBottom: '1px solid #e5e0d8', paddingBottom: '8px' }}>
           <span style={{ fontWeight: 700, fontSize: '16px' }}>Payslip</span>
-          <span style={{ fontWeight: 400, fontSize: '14px' }}>{format(new Date(selectedMonth + '-01'), 'MMMM yyyy')}</span>
+          <span style={{ fontWeight: 400, fontSize: '14px' }}>{format(parseYearMonth(selectedMonth), 'MMMM yyyy')}</span>
         </div>
         <div style={{ marginBottom: '12px', fontWeight: 600 }}>Name: {helper.name}</div>
         <div style={{ marginBottom: '8px' }}>

@@ -6,6 +6,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import { format, subMonths, addMonths } from 'date-fns'
+import { parseYearMonth } from '@/lib/date'
 
 interface MonthSelectorProps {
   selectedMonth: string
@@ -15,7 +16,7 @@ interface MonthSelectorProps {
 export default function MonthSelector({ selectedMonth, onMonthChange }: MonthSelectorProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
-  const currentDate = new Date(selectedMonth + '-01')
+  const currentDate = parseYearMonth(selectedMonth)
   const displayText = format(currentDate, 'MMMM yyyy')
 
   const handlePreviousMonth = () => {

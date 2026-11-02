@@ -51,8 +51,6 @@ export default function Home() {
   const router = useRouter()
 
   const checkAndRedirectIfMonthFullyPaid = useCallback((helpersToCheck: Helper[]) => {
-    console.log('Checking for redirect...', { selectedMonth, helpersCount: helpersToCheck.length })
-    
     // Check if all helpers are fully paid for the current month
     const [month, year] = selectedMonth.split('-')
     
@@ -73,30 +71,16 @@ export default function Home() {
       // Check if there's a "Fully paid" deduction that covers the net pay
       const fullyPaidDeduction = deductions.find(d => d.purpose === 'Fully paid')
       const isFullyPaid = fullyPaidDeduction && fullyPaidDeduction.amount >= netPay
-      
-      console.log(`Helper ${helper.name}:`, {
-        salaryAmount,
-        totalDeductions,
-        totalBonusesNotGiven,
-        netPay,
-        fullyPaidDeduction: fullyPaidDeduction?.amount,
-        isFullyPaid
-      })
-      
+
       return isFullyPaid
     })
-    
-    console.log('All helpers fully paid:', allHelpersFullyPaid)
-    
+
     // If all helpers are fully paid AND there are helpers, move to next month
     if (allHelpersFullyPaid && helpersToCheck.length > 0) {
       const currentDate = parseYearMonth(selectedMonth)
       const nextMonth = addMonths(currentDate, 1)
       const nextMonthString = format(nextMonth, 'yyyy-MM')
-      console.log('Redirecting from', selectedMonth, 'to', nextMonthString)
       setSelectedMonth(nextMonthString)
-    } else {
-      console.log('Not redirecting - no helpers or not all fully paid')
     }
   }, [selectedMonth])
 
@@ -116,10 +100,8 @@ export default function Home() {
       
       // Only check for redirect on the very first load AND when helpers are loaded
       if (isInitialLoad.current && helpersData.length > 0) {
-        console.log('Initial load detected with helpers, will check for redirect')
         isInitialLoad.current = false
         setTimeout(() => {
-          console.log('Calling checkAndRedirectIfMonthFullyPaid')
           checkAndRedirectIfMonthFullyPaid(helpersData)
         }, 100)
       }
@@ -132,24 +114,11 @@ export default function Home() {
   }, [router])
 
   useEffect(() => {
-    // Check authentication by making a request to a protected endpoint
-    const checkAuth = async () => {
-      try {
-        const response = await fetch('/api/helpers')
-        if (response.status === 401) {
-          router.replace('/login')
-          return
-        }
-        setAuthChecked(true)
-        fetchHelpers()
-      } catch (error) {
-        console.error('Auth check failed:', error)
-        router.replace('/login')
-      }
-    }
-
-    checkAuth()
-  }, [router])
+    // fetchHelpers already redirects to /login on a 401, so this is the only
+    // auth check we need — no separate pre-flight request.
+    setAuthChecked(true)
+    fetchHelpers()
+  }, [fetchHelpers])
 
   const handleAddHelper = async (name: string) => {
     try {

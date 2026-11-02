@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { cookies } from 'next/headers'
+import { isAuthenticated } from '@/lib/auth'
 
 export async function GET() {
-  const cookieStore = await cookies();
-  const cookie = cookieStore.get('salary_auth');
-  if (!cookie || cookie.value !== 'authenticated') {
+  if (!(await isAuthenticated())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   try {
@@ -30,9 +28,7 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const cookieStore = await cookies();
-  const cookie = cookieStore.get('salary_auth');
-  if (!cookie || cookie.value !== 'authenticated') {
+  if (!(await isAuthenticated())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   try {

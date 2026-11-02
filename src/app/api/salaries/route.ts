@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { isAuthenticated } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
+  if (!(await isAuthenticated())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
   try {
     const { searchParams } = new URL(request.url)
     const helperId = searchParams.get('helperId')
@@ -36,10 +40,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  if (!(await isAuthenticated())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
   try {
     const { helperId, amount, month, year } = await request.json()
-    
-    if (!helperId || !amount || !month || !year) {
+
+    if (!helperId || amount == null || !month || !year) {
       return NextResponse.json(
         { error: 'Helper ID, amount, month, and year are required' },
         { status: 400 }

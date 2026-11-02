@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { isAuthenticated } from '@/lib/auth'
 
 function isPrismaError(error: unknown): error is { code: string } {
   return (
@@ -12,6 +13,9 @@ function isPrismaError(error: unknown): error is { code: string } {
 
 // GET: List invalid months for a helper
 export async function GET(request: NextRequest) {
+  if (!(await isAuthenticated())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
   try {
     const { searchParams } = new URL(request.url)
     const helperId = searchParams.get('helperId')
@@ -31,6 +35,9 @@ export async function GET(request: NextRequest) {
 
 // POST: Mark a month as invalid
 export async function POST(request: NextRequest) {
+  if (!(await isAuthenticated())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
   try {
     const { helperId, month, year, reason } = await request.json()
     if (!helperId || !month || !year) {
@@ -57,6 +64,9 @@ export async function POST(request: NextRequest) {
 
 // DELETE: Unmark a month as invalid
 export async function DELETE(request: NextRequest) {
+  if (!(await isAuthenticated())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
   try {
     const { searchParams } = new URL(request.url)
     const helperId = searchParams.get('helperId')

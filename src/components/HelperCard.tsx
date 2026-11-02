@@ -96,38 +96,40 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
   const [loadingInvalid, setLoadingInvalid] = useState(false)
   const [expandedDeductionId, setExpandedDeductionId] = useState<string | null>(null)
   const [expandedBonusId, setExpandedBonusId] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
   const receiptRef = useRef<HTMLDivElement>(null)
 
-  const [month, year] = selectedMonth.split('-')
+  // Note: these records store the year in the field called "month" and the
+  // month number in the field called "year" — matching the split below.
+  const [yearStr, monthStr] = selectedMonth.split('-')
 
   // Create stable references for the filtered data using useMemo
   const monthSalary = useMemo(() => {
     const exact = helper.salaries.find(
-      s => s.month === month && s.year === parseInt(year)
+      s => s.month === yearStr && s.year === parseInt(monthStr)
     )
     if (exact) return exact
 
     // No record for this month: fall back to the most recent prior salary
     // so an edited amount carries forward to succeeding months.
-    // Note: s.month stores the year string and s.year stores the month number here.
     const key = (s: { month: string; year: number }) => parseInt(s.month) * 100 + s.year
-    const currentKey = parseInt(month) * 100 + parseInt(year)
+    const currentKey = parseInt(yearStr) * 100 + parseInt(monthStr)
     return helper.salaries
       .filter(s => key(s) < currentKey)
       .sort((a, b) => key(b) - key(a))[0]
-  }, [helper.salaries, month, year])
+  }, [helper.salaries, yearStr, monthStr])
 
   const monthDeductionsData = useMemo(() => {
     return helper.deductions.filter(
-      d => d.month === month && d.year === parseInt(year)
+      d => d.month === yearStr && d.year === parseInt(monthStr)
     )
-  }, [helper.deductions, month, year])
+  }, [helper.deductions, yearStr, monthStr])
 
   const monthBonusesData = useMemo(() => {
     return helper.bonuses.filter(
-      b => b.month === month && b.year === parseInt(year)
+      b => b.month === yearStr && b.year === parseInt(monthStr)
     )
-  }, [helper.bonuses, month, year])
+  }, [helper.bonuses, yearStr, monthStr])
 
   // Update state when computed values change
   useEffect(() => {
@@ -135,6 +137,11 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
     setMonthDeductions(monthDeductionsData)
     setMonthBonuses(monthBonusesData)
   }, [monthSalary, monthDeductionsData, monthBonusesData])
+
+  // Clear any stale action error from a previous month
+  useEffect(() => {
+    setActionError(null)
+  }, [yearStr, monthStr])
 
   // Fetch invalid month when helper or month changes
   useEffect(() => {
@@ -144,7 +151,7 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
         const res = await fetch(`/api/invalid-months?helperId=${helper.id}`)
         if (res.ok) {
           const data = await res.json()
-          const found = data.find((m: InvalidMonth) => m.month === month && m.year === parseInt(year))
+          const found = data.find((m: InvalidMonth) => m.month === yearStr && m.year === parseInt(monthStr))
           setInvalidMonth(found || null)
         } else {
           setInvalidMonth(null)
@@ -156,7 +163,7 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
       }
     }
     fetchInvalidMonth()
-  }, [helper.id, month, year])
+  }, [helper.id, yearStr, monthStr])
 
   const totalDeductions = monthDeductions.reduce((sum, d) => sum + d.amount, 0)
   // Only bonuses not yet given count toward net pay (given bonuses were already handed in advance)
@@ -204,18 +211,22 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
         body: JSON.stringify({
           helperId: helper.id,
           amount: newSalary,
-          month,
-          year: parseInt(year),
+          month: yearStr,
+          year: parseInt(monthStr),
         }),
       })
 
       if (response.ok) {
         setSalary(newSalary)
         setIsEditingSalary(false)
+        setActionError(null)
         onUpdate()
+      } else {
+        setActionError('Could not save the salary. Please try again.')
       }
     } catch (error) {
       console.error('Error updating salary:', error)
+      setActionError('Could not save the salary. Please try again.')
     }
   }
 
@@ -229,21 +240,22 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
           purpose,
           amount,
           date,
-          month,
-          year: parseInt(year),
+          month: yearStr,
+          year: parseInt(monthStr),
           remarks: remarks != null && remarks.trim() !== '' ? remarks.trim() : undefined,
         }),
       })
 
       if (response.ok) {
         setShowAddDeduction(false)
+        setActionError(null)
         // Fetch updated deductions data immediately
         try {
           const deductionsRes = await fetch('/api/deductions')
           if (deductionsRes.ok) {
             const allDeductions = await deductionsRes.json()
             const monthDeductions = allDeductions.filter(
-              (d: Deduction) => d.helperId === helper.id && d.month === month && d.year === parseInt(year)
+              (d: Deduction) => d.helperId === helper.id && d.month === yearStr && d.year === parseInt(monthStr)
             )
             setMonthDeductions(monthDeductions)
           }
@@ -251,9 +263,12 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
           console.error('Error fetching updated deductions:', error)
         }
         onUpdate()
+      } else {
+        setActionError('Could not add the deduction. Please try again.')
       }
     } catch (error) {
       console.error('Error adding deduction:', error)
+      setActionError('Could not add the deduction. Please try again.')
     }
   }
 
@@ -267,8 +282,8 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
           purpose,
           amount,
           date,
-          month,
-          year: parseInt(year),
+          month: yearStr,
+          year: parseInt(monthStr),
           given,
           remarks: remarks != null && remarks.trim() !== '' ? remarks.trim() : undefined,
         }),
@@ -276,13 +291,14 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
 
       if (response.ok) {
         setShowAddBonus(false)
+        setActionError(null)
         // Fetch updated bonuses data immediately
         try {
           const bonusesRes = await fetch('/api/bonuses')
           if (bonusesRes.ok) {
             const allBonuses = await bonusesRes.json()
             const monthBonuses = allBonuses.filter(
-              (b: Bonus) => b.helperId === helper.id && b.month === month && b.year === parseInt(year)
+              (b: Bonus) => b.helperId === helper.id && b.month === yearStr && b.year === parseInt(monthStr)
             )
             setMonthBonuses(monthBonuses)
           }
@@ -290,14 +306,17 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
           console.error('Error fetching updated bonuses:', error)
         }
         onUpdate()
+      } else {
+        setActionError('Could not add the bonus. Please try again.')
       }
     } catch (error) {
       console.error('Error adding bonus:', error)
+      setActionError('Could not add the bonus. Please try again.')
     }
   }
 
   const handleExportCSV = () => {
-    const url = `/api/export?helperId=${helper.id}&month=${month}&year=${year}`
+    const url = `/api/export?helperId=${helper.id}&month=${yearStr}&year=${monthStr}`
     window.open(url, '_blank')
   }
 
@@ -313,18 +332,19 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
           purpose: 'Fully paid',
           amount: toPay,
           date: format(new Date(), 'yyyy-MM-dd'),
-          month,
-          year: parseInt(year),
+          month: yearStr,
+          year: parseInt(monthStr),
         }),
       })
       if (response.ok) {
+        setActionError(null)
         // Fetch updated deductions data immediately
         try {
           const deductionsRes = await fetch('/api/deductions')
           if (deductionsRes.ok) {
             const allDeductions = await deductionsRes.json()
             const monthDeductions = allDeductions.filter(
-              (d: Deduction) => d.helperId === helper.id && d.month === month && d.year === parseInt(year)
+              (d: Deduction) => d.helperId === helper.id && d.month === yearStr && d.year === parseInt(monthStr)
             )
             setMonthDeductions(monthDeductions)
           }
@@ -332,9 +352,12 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
           console.error('Error fetching updated deductions:', error)
         }
         onUpdate()
+      } else {
+        setActionError('Could not mark as paid. Please try again.')
       }
     } catch (error) {
       console.error('Error marking as paid:', error)
+      setActionError('Could not mark as paid. Please try again.')
     } finally {
       setIsPaying(false)
     }
@@ -352,13 +375,14 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
         method: 'DELETE',
       })
       if (response.ok) {
+        setActionError(null)
         // Fetch updated deductions data immediately
         try {
           const deductionsRes = await fetch('/api/deductions')
           if (deductionsRes.ok) {
             const allDeductions = await deductionsRes.json()
             const monthDeductions = allDeductions.filter(
-              (d: Deduction) => d.helperId === helper.id && d.month === month && d.year === parseInt(year)
+              (d: Deduction) => d.helperId === helper.id && d.month === yearStr && d.year === parseInt(monthStr)
             )
             setMonthDeductions(monthDeductions)
           }
@@ -366,9 +390,12 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
           console.error('Error fetching updated deductions:', error)
         }
         onUpdate()
+      } else {
+        setActionError('Could not unmark as paid. Please try again.')
       }
     } catch (error) {
       console.error('Error unmarking as paid:', error)
+      setActionError('Could not unmark as paid. Please try again.')
     } finally {
       setIsPaying(false)
     }
@@ -382,8 +409,8 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           helperId: helper.id,
-          month,
-          year: parseInt(year),
+          month: yearStr,
+          year: parseInt(monthStr),
           reason: invalidReason,
         }),
       })
@@ -394,7 +421,7 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
         const invalidRes = await fetch(`/api/invalid-months?helperId=${helper.id}`)
         if (invalidRes.ok) {
           const data = await invalidRes.json()
-          const found = data.find((m: InvalidMonth) => m.month === month && m.year === parseInt(year))
+          const found = data.find((m: InvalidMonth) => m.month === yearStr && m.year === parseInt(monthStr))
           setInvalidMonth(found || null)
         }
         onUpdate()
@@ -406,7 +433,7 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
         const invalidRes = await fetch(`/api/invalid-months?helperId=${helper.id}`)
         if (invalidRes.ok) {
           const data = await invalidRes.json()
-          const found = data.find((m: InvalidMonth) => m.month === month && m.year === parseInt(year))
+          const found = data.find((m: InvalidMonth) => m.month === yearStr && m.year === parseInt(monthStr))
           setInvalidMonth(found || null)
         }
         onUpdate()
@@ -423,7 +450,7 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
   const handleUnmarkInvalid = async () => {
     setLoadingInvalid(true)
     try {
-      const res = await fetch(`/api/invalid-months?helperId=${helper.id}&month=${month}&year=${year}`, {
+      const res = await fetch(`/api/invalid-months?helperId=${helper.id}&month=${yearStr}&year=${monthStr}`, {
         method: 'DELETE',
       })
       if (res.ok) {
@@ -509,6 +536,15 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
         fontFamily: 'monospace',
         lineHeight: '24px',
       }}>
+        {actionError && (
+          <Alert
+            severity="error"
+            onClose={() => setActionError(null)}
+            sx={{ mb: 0.5, borderRadius: 1, fontSize: '0.75rem', fontFamily: 'monospace', '& .MuiAlert-message': { fontFamily: 'monospace' } }}
+          >
+            {actionError}
+          </Alert>
+        )}
         {/* Invalid Month Banner */}
         {invalidMonth && (
           <Alert 

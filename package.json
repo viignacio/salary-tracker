@@ -7,6 +7,7 @@
     "build": "prisma generate && prisma migrate deploy && DISABLE_ESLINT_PLUGIN=true next build",
     "start": "next start",
     "lint": "next lint",
+    "check:auth": "bash scripts/check-auth.sh",
     "postinstall": "prisma generate"
   },
   "dependencies": {

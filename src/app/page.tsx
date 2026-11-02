@@ -7,7 +7,7 @@ import HelperCard from '@/components/HelperCard'
 import AddHelperModal from '@/components/AddHelperModal'
 import MonthSelector from '@/components/MonthSelector'
 import UnlockDialog from '@/components/UnlockDialog'
-import { Box, Container, Typography, Button, Skeleton } from '@mui/material'
+import { Box, Container, Typography, Button, IconButton, Skeleton } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import MonetizationOnOutlinedIcon from '@mui/icons-material/MonetizationOnOutlined'
 import LogoutIcon from '@mui/icons-material/Logout'
@@ -171,15 +171,8 @@ export default function Home() {
       >
         <Container maxWidth={false} sx={{ width: '100%', maxWidth: '1400px', py: { xs: 2, sm: 3 }, px: { xs: 2, sm: 3 } }}>
           {/* Header */}
-          <Box
-            mb={{ xs: 2, sm: 3 }}
-            display="flex"
-            flexDirection={{ xs: 'column', sm: 'row' }}
-            justifyContent="space-between"
-            alignItems={{ xs: 'flex-start', sm: 'center' }}
-            gap={{ xs: 1.5, sm: 0 }}
-          >
-            <Box>
+          <Box mb={{ xs: 2, sm: 3 }} display="flex" alignItems="center" justifyContent="space-between" gap={1}>
+            <Box sx={{ minWidth: 0 }}>
               <Typography variant="h1" sx={{ color: 'var(--color-ink)', mb: 0.5 }}>
                 Salary Tracker
               </Typography>
@@ -187,12 +180,19 @@ export default function Home() {
                 For private use only
               </Typography>
             </Box>
+            <IconButton
+              onClick={handleLogout}
+              aria-label="Logout"
+              sx={{ display: { xs: 'inline-flex', sm: 'none' }, color: 'var(--color-error)', flexShrink: 0 }}
+            >
+              <LogoutIcon fontSize="small" />
+            </IconButton>
             <Button
               variant="text"
               size="small"
               startIcon={<LogoutIcon fontSize="small" />}
               onClick={handleLogout}
-              sx={{ color: 'var(--color-error)', flexShrink: 0 }}
+              sx={{ display: { xs: 'none', sm: 'inline-flex' }, color: 'var(--color-error)', flexShrink: 0 }}
             >
               Logout
             </Button>

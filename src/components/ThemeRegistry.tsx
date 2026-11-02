@@ -127,11 +127,8 @@ const theme = createTheme({
         root: {
           borderRadius: 'var(--radius-input)',
           minHeight: 44,
-          outline: '2px solid transparent',
-          outlineOffset: -3,
-          '& .MuiOutlinedInput-notchedOutline': { borderColor: color.rule },
+          '& .MuiOutlinedInput-notchedOutline': { borderColor: color.rule, transition: 'none' },
           '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: color.muted },
-          '&.Mui-focused': { outlineColor: color.focus },
           '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: color.ink2 },
           '&.Mui-error .MuiOutlinedInput-notchedOutline': { borderColor: color.error },
         },

@@ -102,9 +102,19 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
 
   // Create stable references for the filtered data using useMemo
   const monthSalary = useMemo(() => {
-    return helper.salaries.find(
+    const exact = helper.salaries.find(
       s => s.month === month && s.year === parseInt(year)
     )
+    if (exact) return exact
+
+    // No record for this month: fall back to the most recent prior salary
+    // so an edited amount carries forward to succeeding months.
+    // Note: s.month stores the year string and s.year stores the month number here.
+    const key = (s: { month: string; year: number }) => parseInt(s.month) * 100 + s.year
+    const currentKey = parseInt(month) * 100 + parseInt(year)
+    return helper.salaries
+      .filter(s => key(s) < currentKey)
+      .sort((a, b) => key(b) - key(a))[0]
   }, [helper.salaries, month, year])
 
   const monthDeductionsData = useMemo(() => {

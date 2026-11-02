@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef, Dispatch, SetStateAction } from 'react'
 import { format } from 'date-fns'
 import { parseYearMonth } from '@/lib/date'
 import AddDeductionModal from './AddDeductionModal'
@@ -93,8 +93,16 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
   const [showInvalidDialog, setShowInvalidDialog] = useState(false)
   const [invalidReason, setInvalidReason] = useState('')
   const [loadingInvalid, setLoadingInvalid] = useState(false)
-  const [expandedDeductionId, setExpandedDeductionId] = useState<string | null>(null)
-  const [expandedBonusId, setExpandedBonusId] = useState<string | null>(null)
+  // Rows start expanded; a row's id goes in here only once the user collapses it.
+  const [collapsedDeductionIds, setCollapsedDeductionIds] = useState<Set<string>>(new Set())
+  const [collapsedBonusIds, setCollapsedBonusIds] = useState<Set<string>>(new Set())
+  const toggleCollapsed = (set: Dispatch<SetStateAction<Set<string>>>, id: string) => {
+    set(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
   const [actionError, setActionError] = useState<string | null>(null)
   const receiptRef = useRef<HTMLDivElement>(null)
 
@@ -571,12 +579,12 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
           ) : (
             <Box component="ul" sx={{ pl: 0, m: 0, listStyle: 'none' }}>
               {monthDeductions.map((deduction) => {
-                const isExpanded = expandedDeductionId === deduction.id
+                const isExpanded = !collapsedDeductionIds.has(deduction.id)
                 return (
                   <Box key={deduction.id} component="li">
                     <Box
                       sx={{ ...rowSx, pl: 1, pr: 0.5 }}
-                      onClick={() => setExpandedDeductionId(id => id === deduction.id ? null : deduction.id)}
+                      onClick={() => toggleCollapsed(setCollapsedDeductionIds, deduction.id)}
                       role="button"
                       tabIndex={0}
                       aria-expanded={isExpanded}
@@ -584,7 +592,7 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault()
-                          setExpandedDeductionId(id => id === deduction.id ? null : deduction.id)
+                          toggleCollapsed(setCollapsedDeductionIds, deduction.id)
                         }
                       }}
                     >
@@ -608,7 +616,6 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
                               const response = await fetch(`/api/deductions?id=${deduction.id}`, { method: 'DELETE' })
                               if (response.ok) {
                                 setMonthDeductions(prevDeductions => prevDeductions.filter(d => d.id !== deduction.id))
-                                if (expandedDeductionId === deduction.id) setExpandedDeductionId(null)
                               }
                               onUpdate()
                             }
@@ -621,7 +628,7 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
                       </Box>
                     </Box>
                     <Collapse in={isExpanded}>
-                      <Box id={`deduction-remarks-${deduction.id}`} sx={{ pl: 4.5, pr: 2, py: 1 }}>
+                      <Box id={`deduction-remarks-${deduction.id}`} sx={{ pl: 'var(--space-xl)', pr: 'var(--space-md)', pt: 0, pb: 'var(--space-sm)' }}>
                         <Typography component="div" sx={{ fontSize: 'var(--text-sm)', color: deduction.remarks?.trim() ? 'var(--color-muted)' : 'var(--color-muted)', fontStyle: deduction.remarks?.trim() ? 'normal' : 'italic', whiteSpace: 'pre-wrap' }}>
                           {deduction.remarks?.trim() || 'No remarks'}
                         </Typography>
@@ -647,12 +654,12 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
           ) : (
             <Box component="ul" sx={{ pl: 0, m: 0, listStyle: 'none' }}>
               {monthBonuses.map((bonus) => {
-                const isExpanded = expandedBonusId === bonus.id
+                const isExpanded = !collapsedBonusIds.has(bonus.id)
                 return (
                   <Box key={bonus.id} component="li">
                     <Box
                       sx={{ ...rowSx, pl: 1, pr: 0.5 }}
-                      onClick={() => setExpandedBonusId(id => id === bonus.id ? null : bonus.id)}
+                      onClick={() => toggleCollapsed(setCollapsedBonusIds, bonus.id)}
                       role="button"
                       tabIndex={0}
                       aria-expanded={isExpanded}
@@ -660,7 +667,7 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault()
-                          setExpandedBonusId(id => id === bonus.id ? null : bonus.id)
+                          toggleCollapsed(setCollapsedBonusIds, bonus.id)
                         }
                       }}
                     >
@@ -705,7 +712,6 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
                               const response = await fetch(`/api/bonuses?id=${bonus.id}`, { method: 'DELETE' })
                               if (response.ok) {
                                 setMonthBonuses(prevBonuses => prevBonuses.filter(b => b.id !== bonus.id))
-                                if (expandedBonusId === bonus.id) setExpandedBonusId(null)
                               }
                               onUpdate()
                             }
@@ -718,7 +724,7 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
                       </Box>
                     </Box>
                     <Collapse in={isExpanded}>
-                      <Box id={`bonus-remarks-${bonus.id}`} sx={{ pl: 4.5, pr: 2, py: 1 }}>
+                      <Box id={`bonus-remarks-${bonus.id}`} sx={{ pl: 'var(--space-xl)', pr: 'var(--space-md)', pt: 0, pb: 'var(--space-sm)' }}>
                         <Typography component="div" sx={{ fontSize: 'var(--text-sm)', color: 'var(--color-muted)', fontStyle: bonus.remarks?.trim() ? 'normal' : 'italic', whiteSpace: 'pre-wrap' }}>
                           {bonus.remarks?.trim() || 'No remarks'}
                         </Typography>

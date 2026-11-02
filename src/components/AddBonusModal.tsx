@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { format } from 'date-fns'
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, IconButton, Stack, FormControlLabel, Checkbox } from '@mui/material'
+import { Box, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, IconButton, Stack, FormControlLabel, Checkbox } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 
 interface AddBonusModalProps {
@@ -39,11 +39,13 @@ export default function AddBonusModal({ isOpen, onClose, onAdd }: AddBonusModalP
 
   return (
     <Dialog open={isOpen} onClose={onClose} maxWidth="xs" fullWidth>
-      <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'var(--color-success)' }}>
-        Add bonus
+      <Box sx={{ position: 'absolute', top: 'var(--space-sm)', right: 'var(--space-sm)' }}>
         <IconButton onClick={onClose} size="small" aria-label="Close">
           <CloseIcon fontSize="small" />
         </IconButton>
+      </Box>
+      <DialogTitle sx={{ pr: 'calc(var(--space-lg) + 40px)', color: 'var(--color-success)' }}>
+        Add bonus
       </DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent>

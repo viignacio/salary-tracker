@@ -139,6 +139,21 @@ const theme = createTheme({
         root: { borderRadius: 'var(--radius-stock)', fontWeight: 500 },
       },
     },
+    MuiDialogTitle: {
+      styleOverrides: {
+        root: { position: 'relative', padding: 'var(--space-lg)' },
+      },
+    },
+    MuiDialogContent: {
+      styleOverrides: {
+        root: { padding: 'var(--space-md) var(--space-lg) var(--space-lg)' },
+      },
+    },
+    MuiDialogActions: {
+      styleOverrides: {
+        root: { padding: 'var(--space-md) var(--space-lg) var(--space-lg)' },
+      },
+    },
     MuiDialog: {
       styleOverrides: {
         paper: {

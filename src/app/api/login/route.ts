@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { AUTH_COOKIE_NAME, authCookieValue } from '@/lib/auth'
 
 const PASSWORD = process.env.SALARY_TRACKER_PASSWORD
-const COOKIE_NAME = 'salary_auth'
 
 export async function POST(request: NextRequest) {
   const { password } = await request.json()
   if (password === PASSWORD) {
     const response = NextResponse.json({ success: true })
-    response.cookies.set(COOKIE_NAME, 'authenticated', {
+    response.cookies.set(AUTH_COOKIE_NAME, authCookieValue(), {
       httpOnly: true,
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
@@ -17,4 +17,4 @@ export async function POST(request: NextRequest) {
     return response
   }
   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-} 
+}

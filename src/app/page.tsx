@@ -1,13 +1,13 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
 import { format, addMonths } from 'date-fns'
 import { parseYearMonth } from '@/lib/date'
 import HelperCard from '@/components/HelperCard'
 import AddHelperModal from '@/components/AddHelperModal'
 import MonthSelector from '@/components/MonthSelector'
-import { Box, Container, Typography, Button, CircularProgress } from '@mui/material'
+import UnlockDialog from '@/components/UnlockDialog'
+import { Box, Container, Typography, Button, Skeleton } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import MonetizationOnOutlinedIcon from '@mui/icons-material/MonetizationOnOutlined'
 import LogoutIcon from '@mui/icons-material/Logout'
@@ -41,33 +41,33 @@ interface Helper {
   }>
 }
 
+type AuthState = 'checking' | 'locked' | 'ready'
+
 export default function Home() {
+  const [authState, setAuthState] = useState<AuthState>('checking')
   const [helpers, setHelpers] = useState<Helper[]>([])
   const [selectedMonth, setSelectedMonth] = useState(format(new Date(), 'yyyy-MM'))
   const [showAddHelper, setShowAddHelper] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [authChecked, setAuthChecked] = useState(false)
   const isInitialLoad = useRef(true)
-  const router = useRouter()
 
   const checkAndRedirectIfMonthFullyPaid = useCallback((helpersToCheck: Helper[]) => {
     // Check if all helpers are fully paid for the current month
     const [month, year] = selectedMonth.split('-')
-    
+
     const allHelpersFullyPaid = helpersToCheck.every(helper => {
       // Get salary for this helper and month
       const salary = helper.salaries.find(s => s.month === month && s.year === parseInt(year))
       const salaryAmount = salary?.amount || 0
-      
+
       // Get deductions and bonuses for this helper and month
       const deductions = helper.deductions.filter(d => d.month === month && d.year === parseInt(year))
       const bonuses = helper.bonuses.filter(b => b.month === month && b.year === parseInt(year))
-      
+
       // Calculate totals (net pay only includes bonuses not yet given)
       const totalDeductions = deductions.reduce((sum, d) => sum + d.amount, 0)
       const totalBonusesNotGiven = bonuses.filter(b => !b.given).reduce((sum, b) => sum + b.amount, 0)
       const netPay = salaryAmount + totalBonusesNotGiven - totalDeductions
-      
+
       // Check if there's a "Fully paid" deduction that covers the net pay
       const fullyPaidDeduction = deductions.find(d => d.purpose === 'Fully paid')
       const isFullyPaid = fullyPaidDeduction && fullyPaidDeduction.amount >= netPay
@@ -89,7 +89,8 @@ export default function Home() {
       const response = await fetch('/api/helpers')
       if (!response.ok) {
         if (response.status === 401) {
-          router.replace('/login')
+          setHelpers([])
+          setAuthState('locked')
           return
         }
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -97,7 +98,8 @@ export default function Home() {
       const data = await response.json()
       const helpersData = Array.isArray(data) ? data : []
       setHelpers(helpersData)
-      
+      setAuthState('ready')
+
       // Only check for redirect on the very first load AND when helpers are loaded
       if (isInitialLoad.current && helpersData.length > 0) {
         isInitialLoad.current = false
@@ -108,17 +110,24 @@ export default function Home() {
     } catch (error) {
       console.error('Error fetching helpers:', error)
       setHelpers([]) // Set empty array on error
-    } finally {
-      setLoading(false)
+      setAuthState('ready')
     }
-  }, [router])
+  }, [checkAndRedirectIfMonthFullyPaid])
 
   useEffect(() => {
-    // fetchHelpers already redirects to /login on a 401, so this is the only
-    // auth check we need — no separate pre-flight request.
-    setAuthChecked(true)
     fetchHelpers()
   }, [fetchHelpers])
+
+  const handleUnlock = async (password: string) => {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password }),
+    })
+    if (!res.ok) return false
+    await fetchHelpers()
+    return true
+  }
 
   const handleAddHelper = async (name: string) => {
     try {
@@ -127,7 +136,7 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name }),
       })
-      
+
       if (response.ok) {
         await fetchHelpers()
         setShowAddHelper(false)
@@ -143,259 +152,120 @@ export default function Home() {
 
   const handleLogout = async () => {
     await fetch('/api/logout', { method: 'POST' })
-    router.push('/login')
+    setHelpers([])
+    setAuthState('locked')
   }
 
-  if (!authChecked) {
-    return (
-      <Box height="100vh" display="flex" alignItems="center" justifyContent="center" bgcolor="#f5f5f5">
-        <Box textAlign="center">
-          <CircularProgress color="primary" />
-          <Typography mt={2} color="text.secondary" sx={{ fontFamily: 'monospace' }}>Checking authentication...</Typography>
-        </Box>
-      </Box>
-    )
-  }
-
-  if (loading) {
-    return (
-      <Box height="100vh" display="flex" alignItems="center" justifyContent="center" bgcolor="#f5f5f5">
-        <Box textAlign="center">
-          <CircularProgress color="primary" />
-          <Typography mt={2} color="text.secondary" sx={{ fontFamily: 'monospace' }}>Loading...</Typography>
-        </Box>
-      </Box>
-    )
-  }
+  const shellLocked = authState !== 'ready'
 
   return (
-      <Box 
-        height="100vh" 
+    <Box sx={{ minHeight: '100dvh', background: 'var(--color-paper)' }}>
+      {authState === 'locked' && <UnlockDialog onUnlock={handleUnlock} />}
+      <Box
+        inert={shellLocked || undefined}
         sx={{
-          background: '#f8fafc',
-          position: 'relative',
-          overflow: 'auto',
+          filter: shellLocked ? 'blur(6px)' : 'none',
+          transition: 'filter var(--dur-long) var(--ease-out)',
+          '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
         }}
       >
-      <Container maxWidth={false} sx={{ 
-        width: '95%', 
-        maxWidth: '1400px',
-        py: { xs: 2, sm: 3 }, 
-        px: { xs: 1.5, sm: 2 }, 
-        position: 'relative', 
-        zIndex: 1 
-      }}>
-        {/* Header */}
-        <Box 
-          mb={{ xs: 2, sm: 3 }}
-          sx={{
-            p: 0,
-          }}
-        >
-          <Box 
-            display="flex" 
+        <Container maxWidth={false} sx={{ width: '100%', maxWidth: '1400px', py: { xs: 2, sm: 3 }, px: { xs: 2, sm: 3 } }}>
+          {/* Header */}
+          <Box
+            mb={{ xs: 2, sm: 3 }}
+            display="flex"
             flexDirection={{ xs: 'column', sm: 'row' }}
-            justifyContent="space-between" 
-            alignItems={{ xs: 'flex-start', sm: 'center' }} 
+            justifyContent="space-between"
+            alignItems={{ xs: 'flex-start', sm: 'center' }}
             gap={{ xs: 1.5, sm: 0 }}
           >
             <Box>
-              <Typography 
-                variant="h4" 
-                fontWeight={600} 
-                sx={{ 
-                  fontSize: { xs: '1.25rem', sm: '1.5rem' },
-                  lineHeight: 1.3,
-                  color: '#1e293b',
-                  mb: 0.5,
-                  fontFamily: 'monospace',
-                }}
-              >
-                Claver GC Salary Tracker
+              <Typography variant="h1" sx={{ color: 'var(--color-ink)', mb: 0.5 }}>
+                Salary Tracker
               </Typography>
-              <Typography 
-                sx={{ 
-                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                  fontWeight: 400,
-                  color: '#64748b',
-                  fontFamily: 'monospace',
-                }}
-              >
-                Manage monthly salaries and deductions for your household helpers
+              <Typography sx={{ fontSize: 'var(--text-sm)', color: 'var(--color-muted)' }}>
+                For private use only
               </Typography>
             </Box>
             <Button
               variant="text"
               size="small"
-              startIcon={<LogoutIcon />}
+              startIcon={<LogoutIcon fontSize="small" />}
               onClick={handleLogout}
-              sx={{ 
-                minWidth: { xs: 'auto', sm: 100 },
-                px: { xs: 1.5, sm: 2 },
-                py: { xs: 1, sm: 1 },
-                color: '#dc2626',
-                fontWeight: 600,
-                fontSize: '0.8125rem',
-                fontFamily: 'monospace',
-                textTransform: 'none',
-                '&:hover': {
-                  background: 'transparent',
-                  textDecoration: 'underline',
-                }
-              }}
+              sx={{ color: 'var(--color-error)', flexShrink: 0 }}
             >
               Logout
             </Button>
           </Box>
-        </Box>
 
-        {/* Controls */}
-        <Box 
-          display="flex" 
-          flexDirection={{ xs: 'column', sm: 'row' }} 
-          gap={{ xs: 1.5, sm: 2 }} 
-          mb={{ xs: 2, sm: 3 }}
-          alignItems={{ xs: 'stretch', sm: 'center' }}
-          justifyContent={{ xs: 'stretch', sm: 'space-between' }}
-          sx={{
-            p: 0,
-          }}
-        >
-          <Box sx={{ display: { xs: 'none', sm: 'block' }, flex: 1 }} />
-          <Box sx={{ display: 'flex', justifyContent: 'center', flex: 1 }}>
-            <MonthSelector
-              selectedMonth={selectedMonth}
-              onMonthChange={handleMonthChange}
-            />
-          </Box>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', flex: 1 }}>
-            <Button
-            variant="text"
-            size="small"
-            startIcon={<AddIcon />}
-            onClick={() => setShowAddHelper(true)}
-            sx={{ 
-              minWidth: { xs: 'auto', sm: 120 }, 
-              fontWeight: 600,
-              py: { xs: 1, sm: 1 },
-              px: { xs: 1.5, sm: 2 },
-              fontSize: '0.8125rem',
-              fontFamily: 'monospace',
-              textTransform: 'none',
-              color: '#1e293b',
-              '&:hover': {
-                background: 'transparent',
-                textDecoration: 'underline',
-              }
-            }}
+          {/* Controls */}
+          <Box
+            display="flex"
+            flexDirection={{ xs: 'column', sm: 'row' }}
+            gap={{ xs: 1.5, sm: 2 }}
+            mb={{ xs: 2, sm: 3 }}
+            alignItems="center"
+            justifyContent="space-between"
           >
-            Add Helper
-          </Button>
-          </Box>
-        </Box>
-
-        {/* Helpers Grid */}
-        {helpers.length === 0 ? (
-          <Box 
-            textAlign="center" 
-            py={{ xs: 6, sm: 8 }}
-            sx={{
-              p: 0,
-            }}
-          >
-            <Box
-              sx={{
-                width: 60,
-                height: 60,
-                borderRadius: '50%',
-                background: '#6366f1',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                mx: 'auto',
-                mb: 2,
-              }}
-            >
-              <MonetizationOnOutlinedIcon sx={{ fontSize: 30, color: 'white' }} />
-            </Box>
-            <Typography 
-              variant="h6" 
-              fontWeight={600} 
-              color="text.primary" 
-              mb={1}
-              sx={{ fontSize: { xs: '1rem', sm: '1.125rem' }, fontFamily: 'monospace' }}
-            >
-              No helpers added yet
-            </Typography>
-            <Typography 
-              color="text.secondary" 
-              mb={3}
-              sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' }, fontFamily: 'monospace' }}
-            >
-              Get started by adding your first household helper
-            </Typography>
+            <MonthSelector selectedMonth={selectedMonth} onMonthChange={handleMonthChange} />
             <Button
-              variant="text"
+              variant="outlined"
               size="small"
-              startIcon={<AddIcon />}
+              startIcon={<AddIcon fontSize="small" />}
               onClick={() => setShowAddHelper(true)}
-              sx={{ 
-                minWidth: { xs: 'auto', sm: 120 }, 
-                fontWeight: 600,
-                py: { xs: 1, sm: 1 },
-                px: { xs: 1.5, sm: 2 },
-                fontSize: '0.8125rem',
-                fontFamily: 'monospace',
-                textTransform: 'none',
-                color: '#1e293b',
-                '&:hover': {
-                  background: 'transparent',
-                  textDecoration: 'underline',
-                }
-              }}
+              sx={{ width: { xs: '100%', sm: 'auto' } }}
             >
-              Add Helper
+              Add helper
             </Button>
           </Box>
-        ) : (
-          <Grid 
-            container 
-            spacing={{ xs: 1.5, sm: 2 }} 
-            justifyContent="center" 
-            sx={{ 
-              width: '100%', 
-              mx: 'auto'
-            }}
-          >
-            {helpers.map((helper) => (
-              <Grid 
-                key={helper.id} 
-                item 
-                xs={12} 
-                sm={6}
-                md={4}
-                sx={{ 
-                  display: 'flex', 
+
+          {/* Helpers Grid */}
+          {!shellLocked && helpers.length === 0 ? (
+            <Box textAlign="center" py={{ xs: 6, sm: 8 }}>
+              <Box
+                sx={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: '50%',
+                  background: 'var(--color-paper-2)',
+                  display: 'flex',
+                  alignItems: 'center',
                   justifyContent: 'center',
+                  mx: 'auto',
+                  mb: 2,
                 }}
               >
-                <HelperCard
-                  helper={helper}
-                  selectedMonth={selectedMonth}
-                  onUpdate={fetchHelpers}
-                />
-              </Grid>
-            ))}
-          </Grid>
-        )}
-      </Container>
+                <MonetizationOnOutlinedIcon sx={{ fontSize: 28, color: 'var(--color-muted)' }} />
+              </Box>
+              <Typography variant="h3" sx={{ color: 'var(--color-ink)', mb: 1 }}>
+                No helpers added yet
+              </Typography>
+              <Typography sx={{ fontSize: 'var(--text-sm)', color: 'var(--color-muted)', mb: 3 }}>
+                Add the first helper to start tracking their pay.
+              </Typography>
+              <Button variant="contained" size="small" startIcon={<AddIcon fontSize="small" />} onClick={() => setShowAddHelper(true)}>
+                Add helper
+              </Button>
+            </Box>
+          ) : (
+            <Grid container spacing={{ xs: 1.5, sm: 2 }} sx={{ width: '100%' }}>
+              {shellLocked
+                ? [0, 1, 2].map((i) => (
+                    <Grid key={i} item xs={12} sm={6} md={4}>
+                      <Skeleton variant="rounded" height={320} sx={{ borderRadius: 'var(--radius-card)', bgcolor: 'var(--color-paper-2)' }} />
+                    </Grid>
+                  ))
+                : helpers.map((helper) => (
+                    <Grid key={helper.id} item xs={12} sm={6} md={4}>
+                      <HelperCard helper={helper} selectedMonth={selectedMonth} onUpdate={fetchHelpers} />
+                    </Grid>
+                  ))}
+            </Grid>
+          )}
+        </Container>
 
-      {/* Add Helper Modal */}
-      <AddHelperModal
-        isOpen={showAddHelper}
-        onClose={() => setShowAddHelper(false)}
-        onAdd={handleAddHelper}
-      />
+        <AddHelperModal isOpen={showAddHelper} onClose={() => setShowAddHelper(false)} onAdd={handleAddHelper} />
+      </Box>
     </Box>
   )
 }

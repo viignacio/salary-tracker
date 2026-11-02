@@ -1,0 +1,26 @@
+[
+ {
+  "mode": "redesign",
+  "depth": "full",
+  "scope": "app",
+  "shape": "app screen",
+  "theme": "coral",
+  "axes": "light/grotesk-sans/warm",
+  "hero": "none (app scope)",
+  "nav": "single bar, wordmark left, logout right",
+  "footer": "none (app scope)",
+  "imagery": "none",
+  "photos": [],
+  "signature": "the payslip sheet inside each helper card",
+  "sections": [
+   "header",
+   "month + add-helper controls",
+   "helper cards (or locked skeleton)"
+  ],
+  "waived": [
+   "26b"
+  ],
+  "prompt": "redesign a simple personal salary tracker for household helpers: password dialog over a blurred dataless dashboard, mobile-friendly, direct and utilitarian, doubles as a payslip generator",
+  "date": "2026-11-02"
+ }
+]

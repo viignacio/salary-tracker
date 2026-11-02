@@ -1,42 +1,20 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Coral (deal 1/3, seed redesign-simple-personal-salary-eda0·6848808c·2026-11-02·r0) · redesign: full
+ * nav: single bar, wordmark left and logout right (kept, restyled) · signature: the payslip sheet inside each helper's card
+ * states: locked (dialog over a blurred, dataless shell), loading (skeleton cards), empty (no helpers yet), full · scope: app
+ * axes: light/grotesk-sans/warm · posture: restrained · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: S, a salary ledger is close kin to Coral's own invoicing material; kept the figures and the "paid" ink exactly where the theme already expects them */
+/* Hallmark · waive 26b · MuiButton/MuiIconButton styleOverrides in ThemeRegistry.tsx carry :active and Mui-disabled · every control on the page is a MUI form control, so its active and disabled states live with the rest of its recipe, not in this stylesheet */
 @import "tailwindcss";
+@import "./tokens.css";
+@import "./base.css" layer(base);
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* MUI's emotion styles are unlayered, so they win over anything in
+   layer(base); every control's surface lives in ThemeRegistry's
+   componentsOverrides instead of a parallel class here. */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-poppins), Arial, Helvetica, sans-serif;
-}
-
-#__next {
-  height: 100vh;
-  overflow: hidden;
+.ink-stamp {
+  color: var(--color-paid);
+  font-weight: 600;
+  transform: rotate(-2deg);
+  display: inline-block;
 }

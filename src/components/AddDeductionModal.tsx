@@ -36,101 +36,35 @@ export default function AddDeductionModal({ isOpen, onClose, onAdd }: AddDeducti
   }
 
   return (
-    <Dialog 
-      open={isOpen} 
-      onClose={onClose} 
-      maxWidth="xs" 
-      fullWidth
-      PaperProps={{
-        sx: {
-          mx: { xs: 2, sm: 'auto' },
-          width: { xs: 'calc(100% - 32px)', sm: 'auto' },
-          background: '#ffffff',
-          borderRadius: 1,
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-          border: '1px solid rgba(0, 0, 0, 0.08)',
-        }
-      }}
-    >
-      <DialogTitle 
-        sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'space-between', 
-          pr: { xs: 1, sm: 1 },
-          px: { xs: 2, sm: 2.5 },
-          py: { xs: 2, sm: 2 },
-          borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
-          fontSize: '1rem',
-          fontWeight: 600,
-          color: '#dc2626',
-          fontFamily: 'monospace',
-        }}
-      >
-        Add Deduction
-        <IconButton 
-          onClick={onClose} 
-          size="small"
-          sx={{
-            '&:hover': {
-              background: 'transparent',
-            }
-          }}
-        >
-          <CloseIcon />
+    <Dialog open={isOpen} onClose={onClose} maxWidth="xs" fullWidth>
+      <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'var(--color-error)' }}>
+        Add deduction
+        <IconButton onClick={onClose} size="small" aria-label="Close">
+          <CloseIcon fontSize="small" />
         </IconButton>
       </DialogTitle>
       <form onSubmit={handleSubmit}>
-        <DialogContent 
-          sx={{ 
-            px: { xs: 2, sm: 2.5 }, 
-            pt: { xs: 2, sm: 2.5 }, 
-            pb: { xs: 1.5, sm: 2 } 
-          }}
-        >
-          <Stack spacing={{ xs: 2, sm: 2.5 }}>
+        <DialogContent>
+          <Stack spacing={2.5}>
             <TextField
               label="Purpose"
               value={purpose}
               onChange={(e) => setPurpose(e.target.value)}
-              placeholder="e.g., Cash advance, Loan payment"
+              placeholder="e.g. Cash advance, Loan payment"
               fullWidth
               required
-              margin="dense"
-              size="small"
-              sx={{
-                fontFamily: 'monospace',
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                  fontFamily: 'monospace',
-                },
-                '& .MuiInputLabel-root': {
-                  fontFamily: 'monospace',
-                }
-              }}
+              autoFocus
             />
             <TextField
               label="Amount"
               type="number"
               value={amount === '0' ? '' : amount}
               onChange={(e) => setAmount(e.target.value)}
-              onFocus={() => { if (amount === '0') setAmount(''); }}
+              onFocus={() => { if (amount === '0') setAmount('') }}
               placeholder="0.00"
               fullWidth
               required
-              margin="dense"
               inputProps={{ min: 0.01, step: 0.01 }}
-              size="small"
-              sx={{
-                fontFamily: 'monospace',
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                  fontFamily: 'monospace',
-                },
-                '& .MuiInputLabel-root': {
-                  fontFamily: 'monospace',
-                }
-              }}
             />
             <TextField
               label="Remarks"
@@ -141,18 +75,6 @@ export default function AddDeductionModal({ isOpen, onClose, onAdd }: AddDeducti
               multiline
               minRows={2}
               maxRows={6}
-              margin="dense"
-              size="small"
-              sx={{
-                fontFamily: 'monospace',
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                  fontFamily: 'monospace',
-                },
-                '& .MuiInputLabel-root': {
-                  fontFamily: 'monospace',
-                }
-              }}
             />
             <TextField
               label="Date"
@@ -161,74 +83,17 @@ export default function AddDeductionModal({ isOpen, onClose, onAdd }: AddDeducti
               onChange={(e) => setDate(e.target.value)}
               fullWidth
               required
-              margin="dense"
               InputLabelProps={{ shrink: true }}
-              size="small"
-              sx={{
-                fontFamily: 'monospace',
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                  fontFamily: 'monospace',
-                },
-                '& .MuiInputLabel-root': {
-                  fontFamily: 'monospace',
-                }
-              }}
             />
           </Stack>
         </DialogContent>
-        <DialogActions 
-          sx={{ 
-            px: { xs: 2, sm: 2.5 }, 
-            pb: { xs: 2, sm: 2.5 }, 
-            pt: { xs: 1.5, sm: 2 },
-            gap: { xs: 1, sm: 1 },
-            borderTop: '1px solid rgba(0, 0, 0, 0.08)',
-          }}
-        >
-          <Button 
-            onClick={onClose} 
-            variant="text"
-            size="small"
-            sx={{ 
-              flex: { xs: 1, sm: 'auto' },
-              px: { xs: 1.5, sm: 2 },
-              py: { xs: 1, sm: 1 },
-              fontSize: '0.8125rem',
-              fontWeight: 600,
-              textTransform: 'none',
-              fontFamily: 'monospace',
-              '&:hover': {
-                background: 'transparent',
-                textDecoration: 'underline',
-              }
-            }}
-          >
-            Cancel
-          </Button>
-          <Button 
-            type="submit" 
-            variant="text"
-            size="small"
-            sx={{ 
-              flex: { xs: 1, sm: 'auto' },
-              px: { xs: 1.5, sm: 2 },
-              py: { xs: 1, sm: 1 },
-              fontSize: '0.8125rem',
-              fontWeight: 600,
-              textTransform: 'none',
-              fontFamily: 'monospace',
-              color: '#dc2626',
-              '&:hover': {
-                background: 'transparent',
-                textDecoration: 'underline',
-              }
-            }}
-          >
-            Add Deduction
+        <DialogActions>
+          <Button onClick={onClose} variant="text">Cancel</Button>
+          <Button type="submit" variant="contained" sx={{ backgroundColor: 'var(--color-error)', '&:hover': { backgroundColor: 'var(--color-error)' } }}>
+            Add deduction
           </Button>
         </DialogActions>
       </form>
     </Dialog>
   )
-} 
+}

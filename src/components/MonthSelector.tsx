@@ -20,21 +20,11 @@ export default function MonthSelector({ selectedMonth, onMonthChange }: MonthSel
   const displayText = format(currentDate, 'MMMM yyyy')
 
   const handlePreviousMonth = () => {
-    const previousMonth = subMonths(currentDate, 1)
-    onMonthChange(format(previousMonth, 'yyyy-MM'))
+    onMonthChange(format(subMonths(currentDate, 1), 'yyyy-MM'))
   }
 
   const handleNextMonth = () => {
-    const nextMonth = addMonths(currentDate, 1)
-    onMonthChange(format(nextMonth, 'yyyy-MM'))
-  }
-
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
-
-  const handleMenuClose = () => {
-    setAnchorEl(null)
+    onMonthChange(format(addMonths(currentDate, 1), 'yyyy-MM'))
   }
 
   const handleMonthSelect = (month: string) => {
@@ -43,241 +33,49 @@ export default function MonthSelector({ selectedMonth, onMonthChange }: MonthSel
   }
 
   // Generate recent months for quick selection
-  const recentMonths = []
   const today = new Date()
-  for (let i = 0; i < 12; i++) {
+  const recentMonths = Array.from({ length: 12 }, (_, i) => {
     const month = subMonths(today, i)
-    recentMonths.push({
-      value: format(month, 'yyyy-MM'),
-      label: format(month, 'MMMM yyyy'),
-    })
-  }
+    return { value: format(month, 'yyyy-MM'), label: format(month, 'MMMM yyyy') }
+  })
 
   return (
-    <>
-      {/* Mobile layout: xs only */}
-      <Box
-        sx={{
-          minHeight: 40,
-          px: 0,
-          position: 'relative',
-          display: { xs: 'block', sm: 'none' },
-          width: '100%',
-        }}
+    <Box display="flex" alignItems="center" gap={0.5}>
+      <IconButton onClick={handlePreviousMonth} size="small" aria-label="Previous month">
+        <ChevronLeftIcon fontSize="small" />
+      </IconButton>
+      <Button
+        variant="text"
+        size="small"
+        startIcon={<CalendarMonthIcon fontSize="small" />}
+        onClick={(e) => setAnchorEl(e.currentTarget)}
+        sx={{ color: 'var(--color-ink)', fontWeight: 600 }}
       >
-        <IconButton
-          onClick={handlePreviousMonth}
-          size="small"
-          sx={{
-            position: 'absolute',
-            left: 4,
-            top: '50%',
-            transform: 'translateY(-50%)',
-            p: 0.75,
-            zIndex: 2,
-            color: '#64748b',
-            '&:hover': {
-              background: 'transparent',
-              color: '#475569',
-            }
-          }}
-        >
-          <ChevronLeftIcon fontSize="small" />
-        </IconButton>
-        <Button
-          size="small"
-          variant="text"
-          startIcon={<CalendarMonthIcon fontSize="small" />}
-          onClick={handleMenuOpen}
-          sx={{
-            textTransform: 'none',
-            fontWeight: 600,
-            color: '#1e293b',
-            px: 1.5,
-            py: 1,
-            fontSize: '0.8125rem',
-            fontFamily: 'monospace',
-            minHeight: 40,
-            position: 'absolute',
-            left: '50%',
-            top: '50%',
-            transform: 'translate(-50%, -50%)',
-            zIndex: 1,
-            '&:hover': {
-              background: 'transparent',
-              textDecoration: 'underline',
-            }
-          }}
-        >
-          {displayText}
-        </Button>
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleMenuClose}
-          PaperProps={{
-            sx: {
-              maxHeight: 300,
-              minWidth: 200,
-              borderRadius: 1,
-              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-              border: '1px solid rgba(0, 0, 0, 0.08)',
-              background: '#ffffff',
-            },
-          }}
-        >
-          <Box px={1.5} pt={1} pb={0.5}>
-            <Typography
-              variant="subtitle2"
-              color="text.secondary"
-              mb={1}
-              sx={{ fontSize: '0.75rem', fontFamily: 'monospace' }}
-            >
-              Recent Months
-            </Typography>
-          </Box>
-          {recentMonths.map((month) => (
-            <MenuItem
-              key={month.value}
-              selected={month.value === selectedMonth}
-              onClick={() => handleMonthSelect(month.value)}
-              sx={{
-                py: 1.5,
-                fontSize: '0.875rem',
-                fontFamily: 'monospace',
-              }}
-            >
-              {month.label}
-            </MenuItem>
-          ))}
-        </Menu>
-        <IconButton
-          onClick={handleNextMonth}
-          size="small"
-          sx={{
-            position: 'absolute',
-            right: 4,
-            top: '50%',
-            transform: 'translateY(-50%)',
-            p: 0.75,
-            zIndex: 2,
-            color: '#64748b',
-            '&:hover': {
-              background: 'transparent',
-              color: '#475569',
-            }
-          }}
-        >
-          <ChevronRightIcon fontSize="small" />
-        </IconButton>
-      </Box>
-      {/* Desktop layout: sm and up only */}
-      <Box
-        sx={{
-          minHeight: 36,
-          px: 0.75,
-          display: { xs: 'none', sm: 'flex' },
-          alignItems: 'center',
-          minWidth: 0,
-          maxWidth: 'none',
-        }}
+        {displayText}
+      </Button>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={() => setAnchorEl(null)}
+        slotProps={{ paper: { sx: { maxHeight: 360, minWidth: 220, mt: 0.5 } } }}
       >
-        <IconButton
-          onClick={handlePreviousMonth}
-          size="small"
-          sx={{
-            p: 0.5,
-            minWidth: 32,
-            minHeight: 32,
-            color: '#64748b',
-            '&:hover': {
-              background: 'transparent',
-              color: '#475569',
-            }
-          }}
-        >
-          <ChevronLeftIcon fontSize="small" />
-        </IconButton>
-        <Button
-          size="small"
-          variant="text"
-          startIcon={<CalendarMonthIcon fontSize="small" />}
-          onClick={handleMenuOpen}
-          sx={{
-            textTransform: 'none',
-            fontWeight: 600,
-            color: '#1e293b',
-            px: 1.5,
-            py: 0.5,
-            fontSize: '0.8125rem',
-            fontFamily: 'monospace',
-            minHeight: 36,
-            mx: 0.5,
-            '&:hover': {
-              background: 'transparent',
-              textDecoration: 'underline',
-            }
-          }}
-        >
-          {displayText}
-        </Button>
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleMenuClose}
-          PaperProps={{
-            sx: {
-              maxHeight: 400,
-              minWidth: 250,
-              borderRadius: 1,
-              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-              border: '1px solid rgba(0, 0, 0, 0.08)',
-              background: '#ffffff',
-            },
-          }}
-        >
-          <Box px={2} pt={1} pb={0.5}>
-            <Typography
-              variant="subtitle2"
-              color="text.secondary"
-              mb={1}
-              sx={{ fontSize: '0.875rem', fontFamily: 'monospace' }}
-            >
-              Recent Months
-            </Typography>
-          </Box>
-          {recentMonths.map((month) => (
-            <MenuItem
-              key={month.value}
-              selected={month.value === selectedMonth}
-              onClick={() => handleMonthSelect(month.value)}
-              sx={{
-                py: 1,
-                fontSize: '1rem',
-                fontFamily: 'monospace',
-              }}
-            >
-              {month.label}
-            </MenuItem>
-          ))}
-        </Menu>
-        <IconButton
-          onClick={handleNextMonth}
-          size="small"
-          sx={{
-            p: 0.5,
-            minWidth: 32,
-            minHeight: 32,
-            color: '#64748b',
-            '&:hover': {
-              background: 'transparent',
-              color: '#475569',
-            }
-          }}
-        >
-          <ChevronRightIcon fontSize="small" />
-        </IconButton>
-      </Box>
-    </>
+        <Box px={2} pt={1} pb={0.5}>
+          <Typography sx={{ fontSize: 'var(--text-xs)', color: 'var(--color-muted)' }}>Recent months</Typography>
+        </Box>
+        {recentMonths.map((month) => (
+          <MenuItem
+            key={month.value}
+            selected={month.value === selectedMonth}
+            onClick={() => handleMonthSelect(month.value)}
+            sx={{ minHeight: 44, fontSize: 'var(--text-sm)' }}
+          >
+            {month.label}
+          </MenuItem>
+        ))}
+      </Menu>
+      <IconButton onClick={handleNextMonth} size="small" aria-label="Next month">
+        <ChevronRightIcon fontSize="small" />
+      </IconButton>
+    </Box>
   )
-} 
+}

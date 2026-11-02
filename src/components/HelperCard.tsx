@@ -13,7 +13,6 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import html2canvas from 'html2canvas'
-import React from 'react'
 
 interface InvalidMonth {
   id: string
@@ -189,14 +188,14 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: bonusId, given }),
       })
-      
+
       // Update local bonuses state immediately
-      setMonthBonuses(prevBonuses => 
-        prevBonuses.map(bonus => 
+      setMonthBonuses(prevBonuses =>
+        prevBonuses.map(bonus =>
           bonus.id === bonusId ? { ...bonus, given } : bonus
         )
       )
-      
+
       onUpdate()
     } catch (error) {
       console.error('Error updating bonus given status:', error)
@@ -469,7 +468,7 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
     try {
       const canvas = await html2canvas(el, {
         scale: 2,
-        backgroundColor: '#faf8f5',
+        backgroundColor: '#fdfbf8',
         useCORS: true,
       })
       const dataUrl = canvas.toDataURL('image/jpeg', 0.92)
@@ -486,372 +485,97 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
     }
   }
 
+  const rowSx = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    minHeight: 44,
+    borderRadius: 'var(--radius-input)',
+    cursor: 'pointer',
+    '&:hover': { backgroundColor: 'var(--color-paper-2)' },
+  }
+
+  const figureSx = { fontFamily: 'var(--font-outlier)', fontVariantNumeric: 'tabular-nums', color: 'var(--color-ink)', fontSize: 'var(--text-sm)' }
+
   return (
-    <Card elevation={0} sx={{ 
-      borderRadius: 1, 
-      width: '100%',
-      maxWidth: '100%',
-      minWidth: 0,
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      background: '#fefefe',
-      border: '1px solid rgba(0, 0, 0, 0.08)',
-      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-      position: 'relative',
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        left: '32px',
-        top: 0,
-        bottom: 0,
-        width: '1px',
-        background: 'rgba(0, 0, 0, 0.1)',
-        zIndex: 1,
-      },
-      '&::after': {
-        content: '""',
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0,
-        backgroundImage: 'repeating-linear-gradient(transparent, transparent 23px, rgba(0, 0, 0, 0.05) 23px, rgba(0, 0, 0, 0.05) 24px)',
-        pointerEvents: 'none',
-        zIndex: 0,
-      }
-    }}>
-      <CardContent sx={{ 
-        p: 0,
-        pl: { xs: '4rem', sm: '4.5rem' },
-        pr: { xs: '1.5rem', sm: '2rem' },
-        pt: 0,
-        pb: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        flex: 1,
-        position: 'relative',
-        zIndex: 2,
-        fontFamily: 'monospace',
-        lineHeight: '24px',
-      }}>
+    <Card elevation={0} sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <CardContent sx={{ p: 'var(--space-md)', '&:last-child': { pb: 'var(--space-md)' }, display: 'flex', flexDirection: 'column', gap: 'var(--space-md)', flex: 1 }}>
         {actionError && (
-          <Alert
-            severity="error"
-            onClose={() => setActionError(null)}
-            sx={{ mb: 0.5, borderRadius: 1, fontSize: '0.75rem', fontFamily: 'monospace', '& .MuiAlert-message': { fontFamily: 'monospace' } }}
-          >
+          <Alert severity="error" onClose={() => setActionError(null)} sx={{ borderRadius: 'var(--radius-input)' }}>
             {actionError}
           </Alert>
         )}
-        {/* Invalid Month Banner */}
         {invalidMonth && (
-          <Alert 
-            severity="warning" 
-            icon={<WarningAmberIcon fontSize="small" />} 
-            sx={{ 
-              mb: 0,
-              borderRadius: 1,
-              background: 'rgba(245, 158, 11, 0.08)',
-              border: '1px solid rgba(245, 158, 11, 0.2)',
-              color: '#92400e',
-              py: 0,
-              lineHeight: '24px',
-              '& .MuiAlert-icon': {
-                color: '#d97706',
-              },
-              '& .MuiAlert-message': {
-                fontSize: '0.75rem',
-                lineHeight: '24px',
-                fontFamily: 'monospace',
-              }
-            }}
-          >
-            <strong style={{ fontFamily: 'monospace' }}>Invalid month.</strong>
-            {invalidMonth.reason && <span style={{ fontFamily: 'monospace' }}> {invalidMonth.reason}</span>}
+          <Alert severity="warning" icon={<WarningAmberIcon fontSize="small" />} sx={{ borderRadius: 'var(--radius-input)' }}>
+            <strong>Invalid month.</strong>
+            {invalidMonth.reason && <span> {invalidMonth.reason}</span>}
           </Alert>
         )}
+
         {/* Header */}
-        <Box 
-          display="flex" 
-          flexDirection={{ xs: 'row', sm: 'row' }}
-          alignItems={{ xs: 'center', sm: 'center' }} 
-          justifyContent="space-between" 
-          gap={0}
-          mb={0}
-          pb={0}
-          sx={{ height: '24px', lineHeight: '24px', mt: '24px' }}
-        >
-          <Typography 
-            variant="h6" 
-            fontWeight={600}
-            sx={{ 
-              fontSize: { xs: '1rem', sm: '1.125rem' },
-              color: '#1e293b',
-              fontFamily: 'monospace',
-              lineHeight: '24px',
-              m: 0,
-              p: 0,
-              mt: 0,
-              mb: 0,
-              pt: 0,
-              pb: 0,
-              height: '24px',
-            }}
-          >
+        <Box display="flex" alignItems="center" justifyContent="space-between" gap={1}>
+          <Typography variant="h3" sx={{ color: 'var(--color-ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {helper.name}
           </Typography>
-          <Box sx={{ ml: 'auto', display: 'flex', justifyContent: { xs: 'flex-end', sm: 'flex-end' } }}>
-            <IconButton
-              size="small"
-              onClick={handleExportCSV}
-              sx={{ 
-                p: 0.25,
-                color: '#64748b',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '24px',
-                height: '24px',
-                minWidth: '24px',
-                '&:hover': {
-                  background: 'rgba(0, 0, 0, 0.04)',
-                  color: '#475569',
-                }
-              }}
-            >
-              <DownloadIcon sx={{ fontSize: '20px', width: '20px', height: '20px' }} />
+          <Tooltip title="Export CSV">
+            <IconButton size="small" onClick={handleExportCSV} aria-label={`Export ${helper.name}'s records as CSV`}>
+              <DownloadIcon fontSize="small" />
             </IconButton>
-          </Box>
+          </Tooltip>
         </Box>
-        
-        {/* Main Content with Flexbox */}
-        <Box 
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100%',
-            gap: 0,
-            m: 0,
-            p: 0,
-            mt: 0,
-            mb: 0,
-            pt: 0,
-            pb: 0,
-            marginBottom: 0,
-            paddingBottom: 0,
-          }}
-        >
-          {/* Scrollable Content Area */}
-          <Box 
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 0,
-              flex: 1,
-              minHeight: 0,
-              m: 0,
-              p: 0,
-              mt: 0,
-              mb: 0,
-              pt: 0,
-              pb: 0,
-              marginBottom: 0,
-              paddingBottom: 0,
-              overflow: 'visible',
-            }}
-          >
-        {/* Salary Section */}
-        <Box mb={0} pb={0} mt={0} pt={0} sx={{ height: '24px', lineHeight: '24px', paddingBottom: 0, marginBottom: 0, paddingTop: 0, marginTop: 0, mb: '24px' }}>
+
+        {/* Salary */}
+        <Box>
           {isEditingSalary ? (
-            <Box 
-              display="flex" 
-              flexDirection={{ xs: 'column', sm: 'row' }}
-              alignItems={{ xs: 'stretch', sm: 'center' }} 
-              gap={0}
-              sx={{ m: 0, p: 0 }}
-            >
+            <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
               <TextField
                 type="number"
                 value={salary === 0 ? '' : salary}
                 onChange={(e) => setSalary(parseFloat(e.target.value) || 0)}
-                onFocus={() => { if (salary === 0) setSalary(NaN); }}
+                onFocus={() => { if (salary === 0) setSalary(NaN) }}
                 size="small"
                 variant="outlined"
                 placeholder="0"
                 inputProps={{ min: 0, step: 0.01 }}
-                sx={{ 
-                  flex: 1,
-                  fontFamily: 'monospace',
-                  '& .MuiOutlinedInput-root': {
-                    fontSize: '0.875rem',
-                    fontFamily: 'monospace',
-                  }
-                }}
+                sx={{ flex: '1 1 140px' }}
               />
-              <Box 
-                display="flex" 
-                gap={0}
-                sx={{ flexDirection: { xs: 'row', sm: 'row' } }}
-              >
-                <Button 
-                  variant="text" 
-                  size="small"
-                  onClick={() => handleSalaryUpdate(isNaN(salary) ? 0 : salary)}
-                  sx={{ 
-                    flex: { xs: 1, sm: 'auto' },
-                    py: 0.25,
-                    px: 1,
-                    fontSize: '0.75rem',
-                    fontFamily: 'monospace',
-                    minWidth: 'auto',
-                    textTransform: 'none',
-                  }}
-                >
-                  Save
-                </Button>
-                <Button 
-                  variant="text" 
-                  size="small"
-                  onClick={() => setIsEditingSalary(false)}
-                  sx={{ 
-                    flex: { xs: 1, sm: 'auto' },
-                    py: 0.25,
-                    px: 1,
-                    fontSize: '0.75rem',
-                    fontFamily: 'monospace',
-                    minWidth: 'auto',
-                    textTransform: 'none',
-                  }}
-                >
-                  Cancel
-                </Button>
-              </Box>
+              <Button variant="contained" size="small" onClick={() => handleSalaryUpdate(isNaN(salary) ? 0 : salary)}>
+                Save
+              </Button>
+              <Button variant="text" size="small" onClick={() => setIsEditingSalary(false)}>
+                Cancel
+              </Button>
             </Box>
           ) : (
-            <Box display="flex" alignItems="center" gap={0} sx={{ m: 0, p: 0, lineHeight: '24px' }}>
-              <Typography 
-                sx={{ 
-                  fontSize: { xs: '0.875rem', sm: '0.9375rem' },
-                  color: '#1e293b',
-                  fontFamily: 'monospace',
-                  lineHeight: '24px',
-                  m: 0,
-                  p: 0,
-                  mt: 0,
-                  mb: 0,
-                  pt: 0,
-                  pb: 0,
-                  height: '24px',
-                }}
-              >
-                Monthly Salary: ₱{salary.toFixed(2)}
+            <Box display="flex" alignItems="center" gap={0.5}>
+              <Typography sx={{ fontSize: 'var(--text-sm)', color: 'var(--color-ink)' }}>
+                Monthly salary: <Box component="span" sx={figureSx}>₱{salary.toFixed(2)}</Box>
               </Typography>
-              <IconButton 
-                onClick={() => setIsEditingSalary(true)} 
-                size="small" 
-                sx={{ 
-                  p: 0.25,
-                  ml: 0,
-                  color: '#94a3b8',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                width: '24px',
-                height: '24px',
-                minWidth: '24px',
-                  '&:hover': {
-                    background: 'transparent',
-                    color: '#64748b',
-                  }
-                }}
-              >
-                <EditIcon sx={{ fontSize: '20px', width: '20px', height: '20px' }} />
+              <IconButton size="small" onClick={() => setIsEditingSalary(true)} aria-label="Edit monthly salary">
+                <EditIcon fontSize="small" />
               </IconButton>
             </Box>
           )}
         </Box>
 
-        {/* Deductions Section */}
-        <Box mb={0} pb={0} mt={0} pt={0} sx={{ display: 'block', lineHeight: '24px', paddingBottom: 0, marginBottom: 0, paddingTop: 0, marginTop: '24px' }}>
-          <Box display="flex" alignItems="center" justifyContent="space-between" mb={0} sx={{ height: '24px', lineHeight: '24px', width: '100%' }}>
-            <Typography 
-              sx={{ 
-                fontSize: { xs: '0.875rem', sm: '0.9375rem' },
-                color: '#1e293b',
-                fontFamily: 'monospace',
-                lineHeight: '24px',
-                m: 0,
-                p: 0,
-                mt: 0,
-                mb: 0,
-                pt: 0,
-                pb: 0,
-                height: '24px',
-              }}
-            >
-              Deductions:
-            </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-              <IconButton
-                size="small"
-                onClick={() => setShowAddDeduction(true)}
-                sx={{ 
-                  p: 0.25,
-                  color: '#94a3b8',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                width: '24px',
-                height: '24px',
-                minWidth: '24px',
-                  '&:hover': {
-                    background: 'transparent',
-                    color: '#64748b',
-                  }
-                }}
-              >
-                <AddIcon sx={{ fontSize: '20px', width: '20px', height: '20px' }} />
-              </IconButton>
-            </Box>
+        {/* Deductions */}
+        <Box>
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Typography sx={{ fontSize: 'var(--text-sm)', color: 'var(--color-ink)', fontWeight: 600 }}>Deductions</Typography>
+            <IconButton size="small" onClick={() => setShowAddDeduction(true)} aria-label="Add deduction">
+              <AddIcon fontSize="small" />
+            </IconButton>
           </Box>
           {monthDeductions.length === 0 ? (
-            <Typography 
-              sx={{ 
-                fontSize: { xs: '0.8125rem', sm: '0.875rem' },
-                color: '#94a3b8',
-                fontFamily: 'monospace',
-                fontStyle: 'italic',
-                lineHeight: '24px',
-                m: 0,
-                p: 0,
-                mt: 0,
-                mb: 0,
-                pt: 0,
-                pb: 0,
-                height: '24px',
-              }}
-            >
-              (none)
-            </Typography>
+            <Typography sx={{ fontSize: 'var(--text-sm)', color: 'var(--color-muted)', fontStyle: 'italic' }}>None</Typography>
           ) : (
-            <Box component="ul" sx={{ pl: 0, m: 0, listStyle: 'none', display: 'block' }}>
+            <Box component="ul" sx={{ pl: 0, m: 0, listStyle: 'none' }}>
               {monthDeductions.map((deduction) => {
                 const isExpanded = expandedDeductionId === deduction.id
                 return (
-                  <Box key={deduction.id} component="li" sx={{ mb: 0 }}>
+                  <Box key={deduction.id} component="li">
                     <Box
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="space-between"
-                      sx={{
-                        height: '24px',
-                        lineHeight: '24px',
-                        cursor: 'pointer',
-                        borderRadius: 1,
-                        '&:hover': { bgcolor: 'action.hover' },
-                      }}
+                      sx={{ ...rowSx, pl: 1, pr: 0.5 }}
                       onClick={() => setExpandedDeductionId(id => id === deduction.id ? null : deduction.id)}
                       role="button"
                       tabIndex={0}
@@ -864,110 +588,43 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
                         }
                       }}
                     >
-                      <Box display="flex" alignItems="center" gap={0.5} sx={{ flex: 1, minWidth: 0, lineHeight: '24px' }}>
-                        {isExpanded ? (
-                          <ExpandLessIcon sx={{ fontSize: '20px', color: '#94a3b8', flexShrink: 0 }} />
-                        ) : (
-                          <ExpandMoreIcon sx={{ fontSize: '20px', color: '#94a3b8', flexShrink: 0 }} />
-                        )}
+                      <Box display="flex" alignItems="center" gap={0.5} sx={{ flex: 1, minWidth: 0 }}>
+                        {isExpanded ? <ExpandLessIcon fontSize="small" sx={{ color: 'var(--color-muted)', flexShrink: 0 }} /> : <ExpandMoreIcon fontSize="small" sx={{ color: 'var(--color-muted)', flexShrink: 0 }} />}
                         <Tooltip title={deduction.purpose} arrow>
-                          <Typography
-                            sx={{
-                              fontSize: { xs: '0.8125rem', sm: '0.875rem' },
-                              color: '#1e293b',
-                              fontFamily: 'monospace',
-                              lineHeight: '24px',
-                              m: 0,
-                              p: 0,
-                              height: '24px',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
-                              flexShrink: 1,
-                              minWidth: 0,
-                            }}
-                          >
+                          <Typography sx={{ fontSize: 'var(--text-sm)', color: 'var(--color-ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
                             {deduction.purpose}
                           </Typography>
                         </Tooltip>
-                        <Typography
-                          sx={{
-                            fontSize: { xs: '0.8125rem', sm: '0.875rem' },
-                            color: '#1e293b',
-                            fontFamily: 'monospace',
-                            lineHeight: '24px',
-                            m: 0,
-                            p: 0,
-                            height: '24px',
-                            flexShrink: 0,
-                          }}
-                        >
-                          - ₱{deduction.amount.toFixed(2)} ({format(new Date(deduction.date), 'MMM dd')})
-                        </Typography>
                       </Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', pr: '16px' }} onClick={(e) => e.stopPropagation()}>
+                      <Box display="flex" alignItems="center" gap={1} sx={{ flexShrink: 0 }}>
+                        <Typography sx={figureSx}>
+                          −₱{deduction.amount.toFixed(2)} ({format(new Date(deduction.date), 'MMM dd')})
+                        </Typography>
                         <IconButton
                           size="small"
-                          onClick={async () => {
+                          onClick={async (e) => {
+                            e.stopPropagation()
                             if (window.confirm('Delete this deduction?')) {
                               const response = await fetch(`/api/deductions?id=${deduction.id}`, { method: 'DELETE' })
                               if (response.ok) {
-                                setMonthDeductions(prevDeductions =>
-                                  prevDeductions.filter(d => d.id !== deduction.id)
-                                )
+                                setMonthDeductions(prevDeductions => prevDeductions.filter(d => d.id !== deduction.id))
                                 if (expandedDeductionId === deduction.id) setExpandedDeductionId(null)
                               }
                               onUpdate()
                             }
                           }}
-                          sx={{
-                            p: 0.25,
-                            color: '#94a3b8',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: '24px',
-                            height: '24px',
-                            minWidth: '24px',
-                            '&:hover': {
-                              background: 'transparent',
-                              color: '#dc2626',
-                            }
-                          }}
+                          aria-label={`Delete deduction: ${deduction.purpose}`}
+                          sx={{ '&:hover': { color: 'var(--color-error)' } }}
                         >
-                          <Typography sx={{ fontSize: '20px', fontFamily: 'monospace', lineHeight: '20px', height: '20px', width: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: 0 }}>×</Typography>
+                          <Typography sx={{ fontSize: '18px', lineHeight: 1, fontFamily: 'var(--font-body)' }}>×</Typography>
                         </IconButton>
                       </Box>
                     </Box>
                     <Collapse in={isExpanded}>
-                      <Box id={`deduction-remarks-${deduction.id}`} sx={{ pl: 4.5, pr: 2, py: 1, pt: 0.5 }}>
-                        {deduction.remarks != null && deduction.remarks.trim() !== '' ? (
-                          <Typography
-                            component="div"
-                            sx={{
-                              fontSize: { xs: '0.8125rem', sm: '0.875rem' },
-                              color: '#64748b',
-                              fontFamily: 'monospace',
-                              whiteSpace: 'pre-wrap',
-                              m: 0,
-                            }}
-                          >
-                            {deduction.remarks}
-                          </Typography>
-                        ) : (
-                          <Typography
-                            component="div"
-                            sx={{
-                              fontSize: { xs: '0.8125rem', sm: '0.875rem' },
-                              color: '#94a3b8',
-                              fontStyle: 'italic',
-                              fontFamily: 'monospace',
-                              m: 0,
-                            }}
-                          >
-                            No remarks
-                          </Typography>
-                        )}
+                      <Box id={`deduction-remarks-${deduction.id}`} sx={{ pl: 4.5, pr: 2, py: 1 }}>
+                        <Typography component="div" sx={{ fontSize: 'var(--text-sm)', color: deduction.remarks?.trim() ? 'var(--color-muted)' : 'var(--color-muted)', fontStyle: deduction.remarks?.trim() ? 'normal' : 'italic', whiteSpace: 'pre-wrap' }}>
+                          {deduction.remarks?.trim() || 'No remarks'}
+                        </Typography>
                       </Box>
                     </Collapse>
                   </Box>
@@ -977,89 +634,24 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
           )}
         </Box>
 
-        {/* Additions Section */}
-        <Box sx={{ m: 0, p: 0, mt: '24px', mb: 0, pt: 0, pb: 0, marginBottom: 0, paddingBottom: 0, marginTop: '24px', paddingTop: 0, display: 'flex', flexDirection: 'column', gap: 0, lineHeight: '24px' }}>
-          <Box display="flex" alignItems="center" justifyContent="space-between" mb={0} sx={{ height: '24px', lineHeight: '24px', m: 0, p: 0, width: '100%' }}>
-            <Typography 
-              sx={{ 
-                fontSize: { xs: '0.875rem', sm: '0.9375rem' },
-                color: '#1e293b',
-                fontFamily: 'monospace',
-                lineHeight: '24px',
-                m: 0,
-                p: 0,
-                mt: 0,
-                mb: 0,
-                pt: 0,
-                pb: 0,
-                height: '24px',
-              }}
-            >
-              Bonus:
-            </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-              <IconButton
-                size="small"
-                onClick={() => setShowAddBonus(true)}
-                sx={{ 
-                  p: 0.25,
-                  color: '#94a3b8',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                width: '24px',
-                height: '24px',
-                minWidth: '24px',
-                  '&:hover': {
-                    background: 'transparent',
-                    color: '#64748b',
-                  }
-                }}
-              >
-                <AddIcon sx={{ fontSize: '20px', width: '20px', height: '20px' }} />
-              </IconButton>
-            </Box>
+        {/* Bonuses */}
+        <Box>
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Typography sx={{ fontSize: 'var(--text-sm)', color: 'var(--color-ink)', fontWeight: 600 }}>Bonus</Typography>
+            <IconButton size="small" onClick={() => setShowAddBonus(true)} aria-label="Add bonus">
+              <AddIcon fontSize="small" />
+            </IconButton>
           </Box>
           {monthBonuses.length === 0 ? (
-            <Box sx={{ m: 0, p: 0, mb: 0, pb: 0, mt: 0, pt: 0, height: '24px', lineHeight: '24px', display: 'flex', alignItems: 'flex-start' }}>
-              <Typography 
-                component="div"
-                sx={{ 
-                  fontSize: { xs: '0.8125rem', sm: '0.875rem' },
-                  color: '#94a3b8',
-                  fontFamily: 'monospace',
-                  fontStyle: 'italic',
-                  lineHeight: '24px',
-                  m: 0,
-                  p: 0,
-                  mt: 0,
-                  mb: 0,
-                  pt: 0,
-                  pb: 0,
-                  display: 'block',
-                  height: '24px',
-                }}
-              >
-                (none)
-              </Typography>
-            </Box>
+            <Typography sx={{ fontSize: 'var(--text-sm)', color: 'var(--color-muted)', fontStyle: 'italic' }}>None</Typography>
           ) : (
-            <Box component="ul" sx={{ pl: 0, m: 0, listStyle: 'none', display: 'block' }}>
+            <Box component="ul" sx={{ pl: 0, m: 0, listStyle: 'none' }}>
               {monthBonuses.map((bonus) => {
                 const isExpanded = expandedBonusId === bonus.id
                 return (
-                  <Box key={bonus.id} component="li" sx={{ mb: 0 }}>
+                  <Box key={bonus.id} component="li">
                     <Box
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="space-between"
-                      sx={{
-                        height: '24px',
-                        lineHeight: '24px',
-                        cursor: 'pointer',
-                        borderRadius: 1,
-                        '&:hover': { bgcolor: 'action.hover' },
-                      }}
+                      sx={{ ...rowSx, pl: 1, pr: 0.5 }}
                       onClick={() => setExpandedBonusId(id => id === bonus.id ? null : bonus.id)}
                       role="button"
                       tabIndex={0}
@@ -1072,152 +664,64 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
                         }
                       }}
                     >
-                      <Box display="flex" alignItems="center" gap={0.5} sx={{ lineHeight: '24px', flex: 1, minWidth: 0 }}>
-                        {isExpanded ? (
-                          <ExpandLessIcon sx={{ fontSize: '20px', color: '#94a3b8', flexShrink: 0 }} />
-                        ) : (
-                          <ExpandMoreIcon sx={{ fontSize: '20px', color: '#94a3b8', flexShrink: 0 }} />
-                        )}
+                      <Box display="flex" alignItems="center" gap={0.5} sx={{ flex: 1, minWidth: 0 }}>
+                        {isExpanded ? <ExpandLessIcon fontSize="small" sx={{ color: 'var(--color-muted)', flexShrink: 0 }} /> : <ExpandMoreIcon fontSize="small" sx={{ color: 'var(--color-muted)', flexShrink: 0 }} />}
                         <Tooltip title={bonus.purpose} arrow>
                           <Typography
                             sx={{
-                              fontSize: { xs: '0.8125rem', sm: '0.875rem' },
-                              color: bonus.given ? '#94a3b8' : '#1e293b',
-                              fontFamily: 'monospace',
+                              fontSize: 'var(--text-sm)',
+                              color: bonus.given ? 'var(--color-muted)' : 'var(--color-ink)',
                               textDecoration: bonus.given ? 'line-through' : 'none',
-                              lineHeight: '24px',
-                              m: 0,
-                              p: 0,
-                              height: '24px',
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
                               whiteSpace: 'nowrap',
-                              flexShrink: 1,
                               minWidth: 0,
                             }}
                           >
                             {bonus.purpose}
                           </Typography>
                         </Tooltip>
-                        <Typography
-                          sx={{
-                            fontSize: { xs: '0.8125rem', sm: '0.875rem' },
-                            color: bonus.given ? '#94a3b8' : '#1e293b',
-                            fontFamily: 'monospace',
-                            textDecoration: bonus.given ? 'line-through' : 'none',
-                            lineHeight: '24px',
-                            m: 0,
-                            p: 0,
-                            height: '24px',
-                            flexShrink: 0,
-                          }}
-                        >
-                          - ₱{bonus.amount.toFixed(2)} ({format(new Date(bonus.date), 'MMM dd')})
-                        </Typography>
                         {bonus.given && (
-                          <Typography
-                            sx={{
-                              fontSize: '0.75rem',
-                              color: '#10b981',
-                              fontFamily: 'monospace',
-                              m: 0,
-                              p: 0,
-                              mt: 0,
-                              mb: 0,
-                              pt: 0,
-                              pb: 0,
-                            }}
-                          >
-                            ✓
-                          </Typography>
+                          <Typography sx={{ fontSize: 'var(--text-xs)', color: 'var(--color-success)', flexShrink: 0 }}>Given</Typography>
                         )}
                       </Box>
-                      <Box display="flex" alignItems="center" gap={0} sx={{ justifyContent: 'flex-end', pr: '16px' }} onClick={(e) => e.stopPropagation()}>
+                      <Box display="flex" alignItems="center" gap={1} sx={{ flexShrink: 0 }}>
+                        <Typography sx={{ ...figureSx, color: bonus.given ? 'var(--color-muted)' : 'var(--color-ink)', textDecoration: bonus.given ? 'line-through' : 'none' }}>
+                          +₱{bonus.amount.toFixed(2)} ({format(new Date(bonus.date), 'MMM dd')})
+                        </Typography>
                         <IconButton
                           size="small"
-                          onClick={() => handleToggleBonusGiven(bonus.id, !bonus.given)}
-                          sx={{
-                            p: 0.25,
-                            color: '#94a3b8',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: '24px',
-                            height: '24px',
-                            minWidth: '24px',
-                            '&:hover': {
-                              background: 'transparent',
-                              color: '#10b981',
-                            }
-                          }}
+                          onClick={(e) => { e.stopPropagation(); handleToggleBonusGiven(bonus.id, !bonus.given) }}
                           aria-label={bonus.given ? 'Mark as not given' : 'Mark as given'}
+                          sx={{ '&:hover': { color: 'var(--color-success)' } }}
                         >
-                          <Typography sx={{ fontSize: '20px', fontFamily: 'monospace', lineHeight: '20px', height: '20px', width: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: 0 }}>
-                            {bonus.given ? '✓' : '○'}
-                          </Typography>
+                          <Typography sx={{ fontSize: '16px', lineHeight: 1, fontFamily: 'var(--font-body)' }}>{bonus.given ? '✓' : '○'}</Typography>
                         </IconButton>
                         <IconButton
                           size="small"
-                          onClick={async () => {
+                          onClick={async (e) => {
+                            e.stopPropagation()
                             if (window.confirm('Delete this addition?')) {
                               const response = await fetch(`/api/bonuses?id=${bonus.id}`, { method: 'DELETE' })
                               if (response.ok) {
-                                setMonthBonuses(prevBonuses =>
-                                  prevBonuses.filter(b => b.id !== bonus.id)
-                                )
+                                setMonthBonuses(prevBonuses => prevBonuses.filter(b => b.id !== bonus.id))
                                 if (expandedBonusId === bonus.id) setExpandedBonusId(null)
                               }
                               onUpdate()
                             }
                           }}
-                          sx={{
-                            p: 0.25,
-                            color: '#94a3b8',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: '24px',
-                            height: '24px',
-                            minWidth: '24px',
-                            '&:hover': {
-                              background: 'transparent',
-                              color: '#dc2626',
-                            }
-                          }}
+                          aria-label={`Delete bonus: ${bonus.purpose}`}
+                          sx={{ '&:hover': { color: 'var(--color-error)' } }}
                         >
-                          <Typography sx={{ fontSize: '20px', fontFamily: 'monospace', lineHeight: '20px', height: '20px', width: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: 0 }}>×</Typography>
+                          <Typography sx={{ fontSize: '18px', lineHeight: 1, fontFamily: 'var(--font-body)' }}>×</Typography>
                         </IconButton>
                       </Box>
                     </Box>
                     <Collapse in={isExpanded}>
-                      <Box id={`bonus-remarks-${bonus.id}`} sx={{ pl: 4.5, pr: 2, py: 1, pt: 0.5 }}>
-                        {bonus.remarks != null && bonus.remarks.trim() !== '' ? (
-                          <Typography
-                            component="div"
-                            sx={{
-                              fontSize: { xs: '0.8125rem', sm: '0.875rem' },
-                              color: '#64748b',
-                              fontFamily: 'monospace',
-                              whiteSpace: 'pre-wrap',
-                              m: 0,
-                            }}
-                          >
-                            {bonus.remarks}
-                          </Typography>
-                        ) : (
-                          <Typography
-                            component="div"
-                            sx={{
-                              fontSize: { xs: '0.8125rem', sm: '0.875rem' },
-                              color: '#94a3b8',
-                              fontStyle: 'italic',
-                              fontFamily: 'monospace',
-                              m: 0,
-                            }}
-                          >
-                            No remarks
-                          </Typography>
-                        )}
+                      <Box id={`bonus-remarks-${bonus.id}`} sx={{ pl: 4.5, pr: 2, py: 1 }}>
+                        <Typography component="div" sx={{ fontSize: 'var(--text-sm)', color: 'var(--color-muted)', fontStyle: bonus.remarks?.trim() ? 'normal' : 'italic', whiteSpace: 'pre-wrap' }}>
+                          {bonus.remarks?.trim() || 'No remarks'}
+                        </Typography>
                       </Box>
                     </Collapse>
                   </Box>
@@ -1226,301 +730,101 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
             </Box>
           )}
         </Box>
-          </Box>{/* Close Scrollable Content Area */}
-          {/* Bottom Section - Always Sticky */}
-          <Box 
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 0,
-              flexShrink: 0,
-              m: 0,
-              p: 0,
-              mt: 0,
-              mb: 0,
-              pt: 0,
-              pb: 0,
-            }}
-          >
-        {/* Net Pay Section */}
-        <Typography 
-          sx={{ 
-            fontSize: { xs: '0.875rem', sm: '0.9375rem' },
-            color: '#1e293b',
-            fontFamily: 'monospace',
-            lineHeight: '24px',
-            m: 0,
-            p: 0,
-            mt: '24px',
-            mb: 0,
-            pt: 0,
-            pb: 0,
-            height: '24px',
-          }}
-        >
-          Net: ₱{netPay.toFixed(2)}
-        </Typography>
-        <Box 
-          display="flex" 
-          justifyContent="center" 
-          gap={0} 
-          flexWrap="wrap" 
-          sx={{ 
-            flexDirection: { xs: 'column', sm: 'row' },
-            height: { xs: 'auto', sm: '24px' },
-            lineHeight: '24px', 
-            m: 0, 
-            mt: '24px' 
-          }}
-        >
-          <Button
-            variant="text"
-            size="small"
-            onClick={isFullyPaid ? handleUnmarkPaid : handleMarkPaid}
-            disabled={(!isFullyPaid && toPay <= 0) || isPaying}
-            sx={{ 
-              py: 0,
-              px: 1,
-              fontSize: { xs: '0.75rem', sm: '0.8125rem' },
-              fontFamily: 'monospace',
-              textTransform: 'none',
-              minWidth: 'auto',
-              lineHeight: '24px',
-              height: '24px',
-              m: 0,
-              color: isFullyPaid ? '#dc2626' : '#10b981',
-              '&:hover': {
-                background: 'transparent',
-                textDecoration: 'underline',
-              },
-              '&:disabled': {
-                color: '#94a3b8',
-              }
-            }}
-          >
-            {isFullyPaid ? (isPaying ? 'Unmarking...' : '[Unmark as Paid]') : (isPaying ? 'Marking...' : '[Mark as Paid]')}
-          </Button>
-          {invalidMonth ? (
+
+        {/* Net pay and actions, pinned to the bottom of the card */}
+        <Box sx={{ mt: 'auto', pt: 'var(--space-sm)', borderTop: '1px solid var(--color-rule)', display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Typography sx={{ fontSize: 'var(--text-sm)', color: 'var(--color-ink)', fontWeight: 600 }}>Net pay</Typography>
+            <Box display="flex" alignItems="center" gap={1}>
+              <Typography sx={{ ...figureSx, fontWeight: 600, fontSize: 'var(--text-md)' }}>₱{netPay.toFixed(2)}</Typography>
+              {isFullyPaid && <Typography className="ink-stamp" sx={{ fontSize: 'var(--text-xs)' }}>Paid</Typography>}
+            </Box>
+          </Box>
+
+          <Box display="flex" gap={1} flexWrap="wrap">
             <Button
-              variant="text"
+              variant="outlined"
               size="small"
-              onClick={handleUnmarkInvalid}
-              disabled={loadingInvalid}
-              sx={{ 
-                py: 0,
-                px: 1,
-                fontSize: { xs: '0.75rem', sm: '0.8125rem' },
-                fontFamily: 'monospace',
-                textTransform: 'none',
-                minWidth: 'auto',
-                lineHeight: '24px',
-                height: '24px',
-                m: 0,
-                color: '#d97706',
-                '&:hover': {
-                  background: 'transparent',
-                  textDecoration: 'underline',
-                },
-                '&:disabled': {
-                  color: '#94a3b8',
-                }
-              }}
+              onClick={isFullyPaid ? handleUnmarkPaid : handleMarkPaid}
+              disabled={(!isFullyPaid && toPay <= 0) || isPaying}
+              sx={{ flex: '1 1 auto', color: isFullyPaid ? 'var(--color-error)' : 'var(--color-success)' }}
             >
-              [Unmark as Invalid]
+              {isFullyPaid ? (isPaying ? 'Unmarking…' : 'Unmark as paid') : (isPaying ? 'Marking…' : 'Mark as paid')}
             </Button>
-          ) : (
-            <Button
-              variant="text"
-              size="small"
-              onClick={() => setShowInvalidDialog(true)}
-              disabled={loadingInvalid}
-              sx={{ 
-                py: 0,
-                px: 1,
-                fontSize: { xs: '0.75rem', sm: '0.8125rem' },
-                fontFamily: 'monospace',
-                textTransform: 'none',
-                minWidth: 'auto',
-                lineHeight: '24px',
-                height: '24px',
-                m: 0,
-                color: '#d97706',
-                '&:hover': {
-                  background: 'transparent',
-                  textDecoration: 'underline',
-                },
-                '&:disabled': {
-                  color: '#94a3b8',
-                }
-              }}
-            >
-              [Mark as Invalid]
-            </Button>
-          )}
-        </Box>
-        <Box
-          display="flex"
-          justifyContent="center"
-          gap={0}
-          flexWrap="wrap"
-          sx={{
-            flexDirection: { xs: 'column', sm: 'row' },
-            height: { xs: 'auto', sm: '24px' },
-            lineHeight: '24px',
-            m: 0,
-            mt: '24px',
-            width: '100%',
-          }}
-        >
-          <Button
-            variant="text"
-            size="small"
-            onClick={handleSaveReceipt}
-            sx={{
-              py: 0,
-              px: 1,
-              fontSize: { xs: '0.75rem', sm: '0.8125rem' },
-              fontFamily: 'monospace',
-              textTransform: 'none',
-              minWidth: 'auto',
-              lineHeight: '24px',
-              height: '24px',
-              m: 0,
-              width: '100%',
-              color: '#2563eb',
-              '&:hover': {
-                background: 'transparent',
-                textDecoration: 'underline',
-              },
-            }}
-          >
-            [Save Receipt]
+            {invalidMonth ? (
+              <Button variant="outlined" size="small" onClick={handleUnmarkInvalid} disabled={loadingInvalid} sx={{ flex: '1 1 auto', color: 'var(--color-warning)' }}>
+                Unmark as invalid
+              </Button>
+            ) : (
+              <Button variant="outlined" size="small" onClick={() => setShowInvalidDialog(true)} disabled={loadingInvalid} sx={{ flex: '1 1 auto', color: 'var(--color-warning)' }}>
+                Mark as invalid
+              </Button>
+            )}
+          </Box>
+          <Button variant="contained" size="small" fullWidth onClick={handleSaveReceipt}>
+            Save payslip
           </Button>
         </Box>
-        <Box sx={{ height: '24px', lineHeight: '24px', m: 0, p: 0, flexShrink: 0 }} aria-hidden />
+
         {/* Reason Dialog */}
-        <Dialog open={showInvalidDialog} onClose={() => setShowInvalidDialog(false)}>
-          <DialogTitle sx={{ fontFamily: 'monospace' }}>Mark Month as Invalid</DialogTitle>
-          <form onSubmit={e => { e.preventDefault(); handleMarkInvalid(); }}>
-            <DialogContent sx={{ px: { xs: 3, sm: 4 }, pt: 3, pb: 2 }}>
+        <Dialog open={showInvalidDialog} onClose={() => setShowInvalidDialog(false)} maxWidth="xs" fullWidth>
+          <DialogTitle>Mark month as invalid</DialogTitle>
+          <form onSubmit={e => { e.preventDefault(); handleMarkInvalid() }}>
+            <DialogContent>
               <Stack spacing={2}>
-                <Typography sx={{ fontSize: { xs: '0.875rem', sm: '1rem' }, fontFamily: 'monospace' }}>
-                  Optionally specify a reason for marking this month as invalid (e.g., not started, on leave):
+                <Typography sx={{ fontSize: 'var(--text-sm)', color: 'var(--color-muted)' }}>
+                  Optionally say why (e.g. not started, on leave).
                 </Typography>
-                <TextField
-                  label="Reason"
-                  value={invalidReason}
-                  onChange={e => setInvalidReason(e.target.value)}
-                  fullWidth
-                  autoFocus
-                  sx={{
-                    fontFamily: 'monospace',
-                    '& .MuiOutlinedInput-root': {
-                      fontFamily: 'monospace',
-                    },
-                    '& .MuiInputLabel-root': {
-                      fontFamily: 'monospace',
-                    }
-                  }}
-                />
+                <TextField label="Reason" value={invalidReason} onChange={e => setInvalidReason(e.target.value)} fullWidth autoFocus />
               </Stack>
             </DialogContent>
-            <DialogActions sx={{ px: { xs: 3, sm: 4 }, pb: 3, pt: 2 }}>
-              <Button 
-                onClick={() => setShowInvalidDialog(false)} 
-                variant="text"
-                size="small"
-                sx={{ 
-                  px: { xs: 1.5, sm: 2 },
-                  py: { xs: 1, sm: 1 },
-                  fontSize: '0.8125rem',
-                  fontWeight: 600,
-                  textTransform: 'none',
-                  fontFamily: 'monospace',
-                  '&:hover': {
-                    background: 'transparent',
-                    textDecoration: 'underline',
-                  }
-                }}
-              >
-                Cancel
-              </Button>
-              <Button 
-                type="submit" 
-                variant="text"
-                size="small"
-                disabled={loadingInvalid}
-                sx={{ 
-                  px: { xs: 1.5, sm: 2 },
-                  py: { xs: 1, sm: 1 },
-                  fontSize: '0.8125rem',
-                  fontWeight: 600,
-                  textTransform: 'none',
-                  fontFamily: 'monospace',
-                  color: '#f59e0b',
-                  '&:hover': {
-                    background: 'transparent',
-                    textDecoration: 'underline',
-                  },
-                  '&:disabled': {
-                    color: 'rgba(0, 0, 0, 0.26)',
-                  }
-                }}
-              >
-                Mark as Invalid
-              </Button>
+            <DialogActions>
+              <Button onClick={() => setShowInvalidDialog(false)} variant="text">Cancel</Button>
+              <Button type="submit" variant="contained" disabled={loadingInvalid}>Mark as invalid</Button>
             </DialogActions>
           </form>
         </Dialog>
-          </Box> {/* Close Bottom Section */}
-        </Box> {/* Close Main Content Flexbox */}
       </CardContent>
-      <AddDeductionModal
-        isOpen={showAddDeduction}
-        onClose={() => setShowAddDeduction(false)}
-        onAdd={handleAddDeduction}
-      />
-      <AddBonusModal
-        isOpen={showAddBonus}
-        onClose={() => setShowAddBonus(false)}
-        onAdd={handleAddBonus}
-      />
-      {/* Hidden receipt for html2canvas capture */}
+
+      <AddDeductionModal isOpen={showAddDeduction} onClose={() => setShowAddDeduction(false)} onAdd={handleAddDeduction} />
+      <AddBonusModal isOpen={showAddBonus} onClose={() => setShowAddBonus(false)} onAdd={handleAddBonus} />
+
+      {/* Hidden payslip for html2canvas capture: plain markup only, no textures,
+          filters or oklch shadows — html2canvas cannot render any of those. */}
       <div
         ref={receiptRef}
         style={{
           position: 'fixed',
           left: '-9999px',
           top: 0,
-          width: '340px',
+          width: '380px',
           padding: '24px',
-          backgroundColor: '#faf8f5',
-          border: '1px solid #e5e0d8',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-          fontFamily: 'monospace',
+          backgroundColor: 'var(--color-cotton)',
+          border: '1px solid var(--color-rule)',
+          fontFamily: 'var(--font-body)',
           fontSize: '14px',
-          color: '#1e293b',
+          color: 'var(--color-print)',
           lineHeight: 1.5,
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', borderBottom: '1px solid #e5e0d8', paddingBottom: '8px' }}>
-          <span style={{ fontWeight: 700, fontSize: '16px' }}>Payslip</span>
-          <span style={{ fontWeight: 400, fontSize: '14px' }}>{format(parseYearMonth(selectedMonth), 'MMMM yyyy')}</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '8px', borderBottom: '1px solid var(--color-rule)', paddingBottom: '8px' }}>
+          <span style={{ fontWeight: 600, fontSize: '16px' }}>Payslip</span>
+          <span style={{ fontWeight: 400, fontSize: '13px' }}>{format(parseYearMonth(selectedMonth), 'MMMM yyyy')}</span>
         </div>
-        <div style={{ marginBottom: '12px', fontWeight: 600 }}>Name: {helper.name}</div>
-        <div style={{ marginBottom: '8px' }}>
-          Monthly Salary: ₱{salary.toFixed(2)}
+        <div style={{ marginBottom: '12px', fontWeight: 600 }}>{helper.name}</div>
+        <div style={{ marginBottom: '8px', fontFamily: 'var(--font-outlier)' }}>
+          Monthly salary: ₱{salary.toFixed(2)}
         </div>
         <div style={{ marginBottom: '4px', fontWeight: 600 }}>Deductions</div>
         {monthDeductions.length === 0 ? (
-          <div style={{ marginBottom: '12px', color: '#64748b' }}>None</div>
+          <div style={{ marginBottom: '12px', color: 'var(--color-muted)' }}>None</div>
         ) : (
           <div style={{ marginBottom: '12px' }}>
             {monthDeductions.map((d) => (
               <div key={d.id} style={{ marginBottom: '8px', paddingLeft: '8px' }}>
-                <div>{d.purpose} — ₱{d.amount.toFixed(2)} ({format(new Date(d.date), 'MMM dd')})</div>
-                <div style={{ fontSize: '12px', color: '#64748b', whiteSpace: 'pre-wrap', marginTop: '2px', paddingLeft: '8px' }}>
-                  {d.remarks != null && d.remarks.trim() !== '' ? d.remarks : 'No remarks'}
+                <div style={{ fontFamily: 'var(--font-outlier)' }}>{d.purpose} — ₱{d.amount.toFixed(2)} ({format(new Date(d.date), 'MMM dd')})</div>
+                <div style={{ fontSize: '12px', color: 'var(--color-muted)', whiteSpace: 'pre-wrap', marginTop: '2px', paddingLeft: '8px' }}>
+                  {d.remarks?.trim() || 'No remarks'}
                 </div>
               </div>
             ))}
@@ -1532,19 +836,19 @@ export default function HelperCard({ helper, selectedMonth, onUpdate }: HelperCa
             <div style={{ marginBottom: '12px' }}>
               {monthBonuses.map((b) => (
                 <div key={b.id} style={{ marginBottom: '8px', paddingLeft: '8px' }}>
-                  <div>{b.purpose} — ₱{b.amount.toFixed(2)} ({format(new Date(b.date), 'MMM dd')})</div>
-                  <div style={{ fontSize: '12px', color: '#64748b', whiteSpace: 'pre-wrap', marginTop: '2px', paddingLeft: '8px' }}>
-                    {b.remarks != null && b.remarks.trim() !== '' ? b.remarks : 'No remarks'}
+                  <div style={{ fontFamily: 'var(--font-outlier)' }}>{b.purpose} — ₱{b.amount.toFixed(2)} ({format(new Date(b.date), 'MMM dd')})</div>
+                  <div style={{ fontSize: '12px', color: 'var(--color-muted)', whiteSpace: 'pre-wrap', marginTop: '2px', paddingLeft: '8px' }}>
+                    {b.remarks?.trim() || 'No remarks'}
                   </div>
                 </div>
               ))}
             </div>
           </>
         )}
-        <div style={{ marginTop: '12px', paddingTop: '8px', borderTop: '1px solid #e5e0d8', fontWeight: 700, fontSize: '15px' }}>
+        <div style={{ marginTop: '12px', paddingTop: '8px', borderTop: '1px solid var(--color-rule)', fontWeight: 600, fontSize: '15px', fontFamily: 'var(--font-outlier)' }}>
           Net pay: ₱{netPay.toFixed(2)}
         </div>
       </div>
     </Card>
   )
-} 
+}
